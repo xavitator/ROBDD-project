@@ -30,36 +30,36 @@ let eq (x : int) (y : int) : int =
 type exp = T of bool | Var of int | No of exp | Et of (exp * exp) | Ou of (exp * exp) | Im of (exp * exp) | Eq of (exp * exp)
 (*Voir pour mettre aussi le nb de Variable*)
 
-let rec isFalse (e : exp) : bool option =
+let rec getBool (e : exp) : bool option =
   match e with
   | T b -> Some b
   | Var _ -> None
   | No e -> begin
-    match isFalse e with
-    | None -> None
-    | Some b -> Some (not b)
+      match getBool e with
+      | None -> None
+      | Some b -> Some (not b)
     end
   | Et (e1, e2) -> begin
-    match isFalse e1 with
-    | None -> None
-    | Some b -> if b then isFalse e2 else Some false
+      match getBool e1 with
+      | None -> None
+      | Some b -> if b then getBool e2 else Some false
     end
   | Ou (e1, e2) -> begin 
-    match isFalse e1 with 
-    | None -> isFalse e2
-    | Some b -> if b then Some true else isFalse e2
+      match getBool e1 with 
+      | None -> getBool e2
+      | Some b -> if b then Some true else getBool e2
     end
   | Im (e1, e2) -> begin
-    match (isFalse e1, isFalse e2) with
-    | (_, Some b) when b -> Some true
-    | (Some b, _) when (not b) -> Some true
-    | (None, _) | (_, None) -> None
-    | _ -> Some false
+      match (getBool e1, getBool e2) with
+      | (_, Some b) when b -> Some true
+      | (Some b, _) when (not b) -> Some true
+      | (None, _) | (_, None) -> None
+      | _ -> Some false
     end
   | Eq (e1, e2) -> begin
-    match (isFalse e1, isFalse e2) with
-    | (None, _) | (_, None) -> None
-    | (Some b1, Some b2) -> Some (b1=b2)
+      match (getBool e1, getBool e2) with
+      | (None, _) | (_, None) -> None
+      | (Some b1, Some b2) -> Some (b1=b2)
     end
 
 
@@ -124,6 +124,7 @@ let rec two_power = function 0 -> 1 | x -> 2 * two_power (x - 1)
 
 (*Fonctions Demandées*)
 
+let replace (f : exp) (i : node) (b : bool) : exp = failwith "a faire"
 
 let mk (i : int) (l : node) (k : node) : node =
   if l = k then l
@@ -134,14 +135,20 @@ let mk (i : int) (l : node) (k : node) : node =
     insert i l k u;
     u
 
-(*let build (f : ?) (n : int) : node = (*n = Nb Variable*)
-  let rec aux (f : ?) (i : int) : node =
-    if i > !n then if f is false ??? then 0 else 1
+let build (f : exp) : node = (*n = Nb Variable*)
+  let rec aux (f : exp) (i : int) : node =
+    if i > !n then 
+      begin
+        match getBool f with
+        | None -> failwith "exception de getBool"
+        | Some b -> if b then 1 else 0
+      end
+
     else 
-    let v0 = aux (f[0/xi]???, i+1) in
-    let v1 = aux (f[1/xi]???, i+1) in
-    mk i v0 v1
-  in aux f 1*)
+      let v0 = aux (replace f i false) (i+1) in
+      let v1 = aux (replace f i true) (i+1) in
+      mk i v0 v1
+  in aux f 1
 
 let apply (op : node->node->node) (u1 : node) (u2 : node) : node =
   let g = Hashtbl.create 4096 in
