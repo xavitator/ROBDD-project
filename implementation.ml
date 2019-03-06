@@ -124,7 +124,17 @@ let rec two_power = function 0 -> 1 | x -> 2 * two_power (x - 1)
 
 (*Fonctions Demandées*)
 
-let replace (f : exp) (i : node) (b : bool) : exp = failwith "a faire"
+let replace (f : exp) (i : node) (b : bool) : exp = 
+  let rec aux (e : exp) : exp =
+    match f with
+    | T b -> T b
+    | Var j -> if i = j then T b else Var j
+    | No e -> No (aux e)
+    | Et (e1, e2) -> Et (aux e1, aux e2)
+    | Ou (e1, e2) -> Ou (aux e1, aux e2)
+    | Im (e1, e2) -> Im (aux e1, aux e2)
+    | Eq (e1, e2) -> Eq (aux e1, aux e2)
+  in aux f
 
 let mk (i : int) (l : node) (k : node) : node =
   if l = k then l
