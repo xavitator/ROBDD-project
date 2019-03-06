@@ -25,8 +25,10 @@ let eq (x : int) (y : int) : int =
   match x with 0 -> no y | _ -> y
 
 
+(** faire match et interpretation partielle *)
 
-type exp = N of int | V of string | No of exp | Et of (exp * exp) | Ou of (exp * exp) | Im of (exp * exp) | Eq of (exp * exp)
+
+type exp = N of int | Var of int | No of exp | Et of (exp * exp) | Ou of (exp * exp) | Im of (exp * exp) | Eq of (exp * exp)
 (*Voir pour mettre aussi le nb de Variable*)
 
 
@@ -39,6 +41,8 @@ let unite (u : node) : bool =
   u = 0 || u = 1
 
 
+(** Mettre en HastTbl *)
+
 type tableT = (int* int* int) list ref;;
 
 type tableH = ((int* int* int)* int) list ref;;
@@ -50,7 +54,7 @@ let h : tableH = ref [];;
 
 let n : int ref = ref 0;;
 
-
+(** changement *)
 let initT : unit = 
   t := [(!n + 1, 0, 0); (!n + 1, 0, 0)]
 
@@ -109,17 +113,17 @@ let apply (op : node->node->node) (u1 : node) (u2 : node) : node =
   let rec aux (u1 : node) (u2 : node) : node =
     if List.mem_assoc (u1, u2) !g then List.assoc (u1, u2) !g
     else
-    let u =
-      if unite u1 && unite u2 then op u1 u2
-      else if var u1 = var u2 then mk (var u1)
-          (aux (low u1) (low u2)) (aux (high u1) (high u2))
-      else if var u1 < var u2 then mk (var u1)
-          (aux (low u1) u2) (aux (high u1) u2)
-      else mk (var u2)
-          (aux u1 (low u2)) (aux u1 (high u2))
-    in 
-    g := ((u1, u2), u) :: !g;
-    u
+      let u =
+        if unite u1 && unite u2 then op u1 u2
+        else if var u1 = var u2 then mk (var u1)
+            (aux (low u1) (low u2)) (aux (high u1) (high u2))
+        else if var u1 < var u2 then mk (var u1)
+            (aux (low u1) u2) (aux (high u1) u2)
+        else mk (var u2)
+            (aux u1 (low u2)) (aux u1 (high u2))
+      in 
+      g := ((u1, u2), u) :: !g;
+      u
   in
   aux u1 u2
 
@@ -137,8 +141,8 @@ let satCount (u : node) : int =
     if u = 0 then 0
     else if u = 1 then 1
     else 
-    two_power (var (low u) - var u - 1) * aux (low u) +
-    two_power (var (high u) - var u - 1) * aux (high u)
+      two_power (var (low u) - var u - 1) * aux (low u) +
+      two_power (var (high u) - var u - 1) * aux (high u)
   in aux u
 
 let rec anySat (u : node) : (int* int) list =
