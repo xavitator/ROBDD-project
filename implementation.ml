@@ -27,8 +27,41 @@ let eq (x : int) (y : int) : int =
 (** faire match et interpretation partielle *)
 
 
-type exp = N of int | Var of int | No of exp | Et of (exp * exp) | Ou of (exp * exp) | Im of (exp * exp) | Eq of (exp * exp)
+type exp = T of bool | Var of int | No of exp | Et of (exp * exp) | Ou of (exp * exp) | Im of (exp * exp) | Eq of (exp * exp)
 (*Voir pour mettre aussi le nb de Variable*)
+
+let rec isFalse (e : exp) : bool option =
+  match e with
+  | T b -> Some b
+  | Var _ -> None
+  | No e -> begin
+    match isFalse e with
+    | None -> None
+    | Some b -> Some (not b)
+    end
+  | Et (e1, e2) -> begin
+    match isFalse e1 with
+    | None -> None
+    | Some b -> if b then isFalse e2 else Some false
+    end
+  | Ou (e1, e2) -> begin 
+    match isFalse e1 with 
+    | None -> isFalse e2
+    | Some b -> if b then Some true else isFalse e2
+    end
+  | Im (e1, e2) -> begin
+    match (isFalse e1, isFalse e2) with
+    | (_, Some b) when b -> Some true
+    | (Some b, _) when (not b) -> Some true
+    | (None, _) | (_, None) -> None
+    | _ -> Some false
+    end
+  | Eq (e1, e2) -> begin
+    match (isFalse e1, isFalse e2) with
+    | (None, _) | (_, None) -> None
+    | (Some b1, Some b2) -> Some (b1=b2)
+    end
+
 
 
 (*Fonctions de Base*)
