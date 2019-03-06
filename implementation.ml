@@ -1,6 +1,5 @@
 (*Implementation des Algorithmes demandés*)
 
-
 (*Remarque : 
   - n, t et h sont trois references
   - Modifier les structures de t, h et g (Dans apply) --> Voir array Sauf pour h (Pas possible)
@@ -43,46 +42,49 @@ let unite (u : node) : bool =
 
 (** Mettre en HastTbl *)
 
-type tableT = (int* int* int) list ref;;
-
-type tableH = ((int* int* int)* int) list ref;;
 
 
-let t : tableT = ref [];;
+let t = Hashtbl.create 4096
 
-let h : tableH = ref [];;
+let h = Hashtbl.create 4096
 
-let n : int ref = ref 0;;
+let n : int ref = ref 0
 
 (** changement *)
 let initT : unit = 
-  t := [(!n + 1, 0, 0); (!n + 1, 0, 0)]
+  begin
+    Hashtbl.add t 0 (!n + 1, 0, 0); 
+    Hashtbl.add t 1 (!n + 1, 0, 0)
+  end
 
 let add (i : int) (l : node) (k : node) : node = 
-  t := (i, l, k) :: !t;
-  List.length !t - 1
+  let res = Hashtbl.length t in
+  Hashtbl.add t res (i,l,k); res
 
 let var (u : node) : int =
-  let (i, _, _) = List.nth !t u in i
+  let (i,l,h) = Hashtbl.find t u in i
 
 let low (u : node) : node =
-  let (_, l, _) = List.nth !t u in l
+  let (i,l,h) = Hashtbl.find t u in l
 
 let high (u : node) : node =
-  let (_, _, k) = List.nth !t u in k
+  let (i,l,h) = Hashtbl.find t u in h
 
 
-let initT : unit  =
-  h := []
+let initH : unit  =
+  begin
+    Hashtbl.add h (!n + 1, 0, 0) 0; 
+    Hashtbl.add h (!n + 1, 0, 0) 1
+  end
 
 let member (i : int) (l : node) (k : node) : bool =
-  List.mem_assoc (i, l, k) !h
+  Hashtbl.mem h (i,l,k) 
 
 let lookup (i : int) (l : node) (k : node) : node =
-  List.assoc (i, l, k) !h
+  Hashtbl.find h (i,l,k)
 
 let insert (i : int) (l : node) (k : node) (u : node) : unit =
-  h := ((i, l, k), u) :: !h
+  Hashtbl.replace h (i,l,k) u
 
 let rec two_power = function 0 -> 1 | x -> 2 * two_power (x - 1)
 
@@ -109,20 +111,26 @@ let mk (i : int) (l : node) (k : node) : node =
   in aux f 1*)
 
 let apply (op : node->node->node) (u1 : node) (u2 : node) : node =
-  let g : ((node* node)* node) list ref = ref [] in
+  let g = Hashtbl.create 4096 in
   let rec aux (u1 : node) (u2 : node) : node =
-    if List.mem_assoc (u1, u2) !g then List.assoc (u1, u2) !g
+    if Hashtbl.mem g (u1, u2) then Hashtbl.find g (u1, u2)
     else
       let u =
         if unite u1 && unite u2 then op u1 u2
-        else if var u1 = var u2 then mk (var u1)
-            (aux (low u1) (low u2)) (aux (high u1) (high u2))
-        else if var u1 < var u2 then mk (var u1)
-            (aux (low u1) u2) (aux (high u1) u2)
-        else mk (var u2)
-            (aux u1 (low u2)) (aux u1 (high u2))
+        else if var u1 = var u2 then 
+          mk (var u1)
+            (aux (low u1) (low u2)) 
+            (aux (high u1) (high u2))
+        else if var u1 < var u2 then 
+          mk (var u1)
+            (aux (low u1) u2) 
+            (aux (high u1) u2)
+        else 
+          mk (var u2)
+            (aux u1 (low u2)) 
+            (aux u1 (high u2))
       in 
-      g := ((u1, u2), u) :: !g;
+      Hashtbl.add g (u1, u2) u;
       u
   in
   aux u1 u2
