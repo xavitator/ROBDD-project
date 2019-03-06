@@ -1,10 +1,5 @@
 (*Implementation des Algorithmes demandés*)
 
-(*Remarque : 
-  - n, t et h sont trois references
-  - Modifier les structures de t, h et g (Dans apply) --> Voir array Sauf pour h (Pas possible)
-*)
-
 
 (*Fonctions de Language Binaire*)
 
@@ -28,7 +23,6 @@ let eq (x : int) (y : int) : int =
 
 
 type exp = T of bool | Var of int | No of exp | Et of (exp * exp) | Ou of (exp * exp) | Im of (exp * exp) | Eq of (exp * exp)
-(*Voir pour mettre aussi le nb de Variable*)
 
 let rec getBool (e : exp) : bool option =
   match e with
@@ -63,7 +57,6 @@ let rec getBool (e : exp) : bool option =
     end
 
 
-
 (*Fonctions de Base*)
 
 type node = int;;
@@ -84,7 +77,7 @@ let h = Hashtbl.create 4096
 let n : int ref = ref 0
 
 (** changement *)
-let initT : unit = 
+let initT () : unit = 
   begin
     Hashtbl.add t 0 (!n + 1, 0, 0); 
     Hashtbl.add t 1 (!n + 1, 0, 0)
@@ -104,7 +97,7 @@ let high (u : node) : node =
   let (i,l,h) = Hashtbl.find t u in h
 
 
-let initH : unit  =
+let initH () : unit  =
   begin
     Hashtbl.add h (!n + 1, 0, 0) 0; 
     Hashtbl.add h (!n + 1, 0, 0) 1
@@ -126,7 +119,7 @@ let rec two_power = function 0 -> 1 | x -> 2 * two_power (x - 1)
 
 let replace (f : exp) (i : node) (b : bool) : exp = 
   let rec aux (e : exp) : exp =
-    match f with
+    match e with
     | T b -> T b
     | Var j -> if i = j then T b else Var j
     | No e -> No (aux e)
@@ -145,9 +138,9 @@ let mk (i : int) (l : node) (k : node) : node =
     insert i l k u;
     u
 
-let build (f : exp) : node = (*n = Nb Variable*)
+let build (f : exp) : node =
   let rec aux (f : exp) (i : int) : node =
-    if i > !n then 
+    if i >= !n then 
       begin
         match getBool f with
         | None -> failwith "exception de getBool"
@@ -158,7 +151,7 @@ let build (f : exp) : node = (*n = Nb Variable*)
       let v0 = aux (replace f i false) (i+1) in
       let v1 = aux (replace f i true) (i+1) in
       mk i v0 v1
-  in aux f 1
+  in aux f 0
 
 let apply (op : node->node->node) (u1 : node) (u2 : node) : node =
   let g = Hashtbl.create 4096 in
@@ -230,6 +223,34 @@ let simplify (d : node) (u : node) : node =
     else mk (var u) (aux d (low u)) (aux d (high u))
   in aux d u
 
+(*Affichage simple de ROBDD*)
 
+let aff (n : node) : unit =
+  let rec aux (n : node) (esp : string) : unit =
+    print_string (esp ^ (string_of_int n));
+    if not(unite n) then begin print_endline (":" ^ (string_of_int (var n))); aux (low n) (esp ^ " |"); print_endline ""; aux (high n) (esp ^ "  ")end
+  in
+  aux n "";
+  print_endline ""
 
+(*Affiche : node n : var n
+                     low n
+                     high n*)
+
+(*Test*)
+
+let tot : exp = Eq(Et(Im(Var 1, No(Var 0)), Ou(Var 0, No(Var 1))), No(Var 1));;
+(*((B->-A)^(Av-B))<->-B totologie*)
+
+let ant : exp = Eq(Et(Im(Var 1, No(Var 0)), Ou(Var 0, No(Var 1))), Var 1);;
+(*((B->-A)^(Av-B))<->B antilogie*)
+
+let impl : exp = Im(Im(Im(Var 0, Var 1), Im(Var 1, Var 2)), Im(Var 0, Var 2));;
+(*((A->B)->(B->C))->(A->C) Faux pour A Vrai et B et C Faux*)
+
+let big : exp = Eq(Et(Im(Var 0, Var 1), No(Var 4)), Im(Ou(No(Var 1), Var 3), Im(Et(Var 0, No(Var 2)), Eq(Var 2, Ou(Var 4, No(Var 3))))));;
+(*(((A->B)^-E)<->((-BvD)->((A^-C)->(c<->(Ev-D)))))*)
+
+let _ = n := 5; initT(); initH();
+  aff (build big)
 
