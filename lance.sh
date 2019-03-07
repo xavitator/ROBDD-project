@@ -10,7 +10,7 @@ rm -f *.cmi *.cmo
 #Lance le jeu
  
 if [ "$#" -gt "0" ]
-
-then ./implementation&
+echo 
+then ./implementation &
 
 fi
