@@ -1,5 +1,6 @@
 (*Implementation des Algorithmes demandés*)
 
+let map_size = 4096;;
 
 (*Fonctions de Language Binaire*)
 
@@ -35,12 +36,12 @@ let rec getBool (e : exp) : bool option =
     end
   | Et (e1, e2) -> begin
       match getBool e1 with
-      | None -> None
+      | None -> begin match getBool e2 with None -> None | Some b -> if b then None else Some false end
       | Some b -> if b then getBool e2 else Some false
     end
   | Ou (e1, e2) -> begin 
       match getBool e1 with 
-      | None -> getBool e2
+      | None -> begin match getBool e2 with None -> None | Some b -> if b then Some true else None end
       | Some b -> if b then Some true else getBool e2
     end
   | Im (e1, e2) -> begin
@@ -70,9 +71,9 @@ let unite (u : node) : bool =
 
 
 
-let t = Hashtbl.create 4096
+let t = Hashtbl.create map_size
 
-let h = Hashtbl.create 4096
+let h = Hashtbl.create map_size
 
 let n : int ref = ref 0
 
@@ -140,21 +141,19 @@ let mk (i : int) (l : node) (k : node) : node =
 
 let build (f : exp) : node =
   let rec aux (f : exp) (i : int) : node =
-    if i >= !n then 
-      begin
-        match getBool f with
-        | None -> failwith "exception de getBool"
+    match getBool f with
+        | None -> begin
+            if i >= (!n) then failwith "exception de getBool"
+            else
+            let v0 = aux (replace f i false) (i+1) in
+            let v1 = aux (replace f i true) (i+1) in
+            mk i v0 v1
+          end
         | Some b -> if b then 1 else 0
-      end
-
-    else 
-      let v0 = aux (replace f i false) (i+1) in
-      let v1 = aux (replace f i true) (i+1) in
-      mk i v0 v1
   in aux f 0
 
 let apply (op : node->node->node) (u1 : node) (u2 : node) : node =
-  let g = Hashtbl.create 4096 in
+  let g = Hashtbl.create (map_size*map_size) in
   let rec aux (u1 : node) (u2 : node) : node =
     if Hashtbl.mem g (u1, u2) then Hashtbl.find g (u1, u2)
     else
@@ -237,6 +236,18 @@ let aff (n : node) : unit =
                      low n
                      high n*)
 
+let rec string_of_exp (e : exp) (esp : string): string =
+  match e with
+  | T b -> string_of_bool b
+  | Var n -> "x" ^ string_of_int n
+  | No e -> "No(" ^ string_of_exp e (esp ^ "   ") ^ "\n" ^ esp ^ ")"
+  | Et (e1,e2) -> "\n" ^ esp ^ "Et(" ^ string_of_exp e1 (esp ^ "  ") ^ "," ^ string_of_exp e2 (esp ^ "  ") ^ ")"
+  | Ou (e1,e2) -> "\n" ^ esp ^ "Ou(" ^ string_of_exp e1 (esp ^ "  ") ^ "," ^ string_of_exp e2 (esp ^ "  ") ^ ")"
+  | Im (e1,e2) -> "\n" ^ esp ^ "Im(" ^ string_of_exp e1 (esp ^ "  ") ^ "," ^ string_of_exp e2 (esp ^ "  ") ^ ")"
+  | Eq (e1,e2) -> "\n" ^ esp ^ "Eq(" ^ string_of_exp e1 (esp ^ "  ") ^ "," ^ string_of_exp e2 (esp ^ "  ") ^ ")"
+
+(*Affiche les exp*)
+
 (*Test*)
 
 let tot : exp = Eq(Et(Im(Var 1, No(Var 0)), Ou(Var 0, No(Var 1))), No(Var 1));;
@@ -251,6 +262,8 @@ let impl : exp = Im(Im(Im(Var 0, Var 1), Im(Var 1, Var 2)), Im(Var 0, Var 2));;
 let big : exp = Eq(Et(Im(Var 0, Var 1), No(Var 4)), Im(Ou(No(Var 1), Var 3), Im(Et(Var 0, No(Var 2)), Eq(Var 2, Ou(Var 4, No(Var 3))))));;
 (*(((A->B)^-E)<->((-BvD)->((A^-C)->(c<->(Ev-D)))))*)
 
-let _ = n := 5; initT(); initH();
-  aff (build big)
+let main e i = n := i; initT(); initH(); print_endline (string_of_exp e ""); print_endline "Start Build ..."; 
+  let x = build e in aff x; print_endline (string_of_int x)
+
+(*let _ = main big 5*)
 
