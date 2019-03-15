@@ -25,36 +25,50 @@ let eq (x : int) (y : int) : int =
 
 type exp = T of bool | Var of int | No of exp | Et of (exp * exp) | Ou of (exp * exp) | Im of (exp * exp) | Eq of (exp * exp)
 
-let rec getBool (e : exp) (tab : bool option array) : bool option =
+let rec getBool (e : exp) (tab : bool option array) : (bool option * exp) =
   match e with
-  | T b -> Some b
-  | Var i -> tab.(i)
+  | T b -> (Some b, T b)
+  | Var i -> begin 
+      match tab.(i) with 
+      | None -> (None, Var i)
+      | Some b -> (Some b, T b)
+    end
   | No e -> begin
       match getBool e tab with
-      | None -> None
-      | Some b -> Some (not b)
+      | (None, e) -> (None, No e)
+      | (Some b, _) -> (Some (not b), T b)
     end
   | Et (e1, e2) -> begin
       match getBool e1 tab with
-      | None -> None
-      | Some b -> if b then getBool e2 tab else Some false
+      | (None, e1) -> (None, Et (e1,e2))
+      | (Some b, _) -> if b then getBool e2 tab else (Some false, T false)
     end
   | Ou (e1, e2) -> begin 
       match getBool e1 tab with 
-      | None -> begin match getBool e2 tab with None -> None | Some b -> if b then Some true else None end
-      | Some b -> if b then Some true else getBool e2 tab
+      | (None, e1) -> begin 
+          match getBool e2 tab with 
+          | (None, e2) -> (None, Ou (e1, e2)) 
+          | (Some b, _) -> if b then (Some true, T true) else (None, e1) 
+        end
+      | (Some b, _) -> if b then (Some true, T true) else getBool e2 tab
     end
   | Im (e1, e2) -> begin
-      match (getBool e1 tab, getBool e2 tab) with
-      | (_, Some b) when b -> Some true
-      | (Some b, _) when (not b) -> Some true
-      | (None, _) | (_, None) -> None
-      | _ -> Some false
+      match getBool e1 tab with
+      | (Some b, e1) -> if b then getBool e2 tab else (Some true, T true)
+      | (None, e1) -> begin 
+          match getBool e2 tab with
+          | (Some b, e2) -> if b then (Some true, T true) else (None, e1)
+          | (None, e2) -> (None, Im (e1,e2))
+        end
     end
   | Eq (e1, e2) -> begin
-      match (getBool e1 tab, getBool e2 tab) with
-      | (None, _) | (_, None) -> None
-      | (Some b1, Some b2) -> Some (b1=b2)
+      match getBool e1 tab with
+      | (None, e1) -> (None, Eq (e1, e2))
+      | (Some b, e1) -> begin
+          match getBool e2 tab with
+          | (None, e2) -> (None, Eq (e1,e2))
+          | (Some c, _) -> (Some (c=b), T (c = b)) 
+        end
     end
 
 
@@ -129,7 +143,7 @@ let mk (i : int) (l : node) (k : node) : node =
 let build (f : exp) : node =
   let rec aux (f : exp) (i : int) (tab : bool option array): node =
     match getBool f tab with
-    | None -> begin
+    | (None, f) -> begin
         if i >= (!n) then failwith "exception de getBool"
         else
           let v0 = tab.(i) <- Some false; aux f (i+1) tab in
@@ -137,7 +151,7 @@ let build (f : exp) : node =
           tab.(i) <- None;
           mk i v0 v1
       end
-    | Some b -> if b then 1 else 0
+    | (Some b, _) -> if b then 1 else 0
   in
   let tab = Array.init (!n) (function a -> None) in
   aux f 0 tab
