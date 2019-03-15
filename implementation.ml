@@ -25,34 +25,34 @@ let eq (x : int) (y : int) : int =
 
 type exp = T of bool | Var of int | No of exp | Et of (exp * exp) | Ou of (exp * exp) | Im of (exp * exp) | Eq of (exp * exp)
 
-let rec getBool (e : exp) : bool option =
+let rec getBool (e : exp) (tab : bool option array) : bool option =
   match e with
   | T b -> Some b
-  | Var _ -> None
+  | Var i -> tab.(i)
   | No e -> begin
-      match getBool e with
+      match getBool e tab with
       | None -> None
       | Some b -> Some (not b)
     end
   | Et (e1, e2) -> begin
-      match getBool e1 with
-      | None -> begin match getBool e2 with None -> None | Some b -> if b then None else Some false end
-      | Some b -> if b then getBool e2 else Some false
+      match getBool e1 tab with
+      | None -> None
+      | Some b -> if b then getBool e2 tab else Some false
     end
   | Ou (e1, e2) -> begin 
-      match getBool e1 with 
-      | None -> begin match getBool e2 with None -> None | Some b -> if b then Some true else None end
-      | Some b -> if b then Some true else getBool e2
+      match getBool e1 tab with 
+      | None -> begin match getBool e2 tab with None -> None | Some b -> if b then Some true else None end
+      | Some b -> if b then Some true else getBool e2 tab
     end
   | Im (e1, e2) -> begin
-      match (getBool e1, getBool e2) with
+      match (getBool e1 tab, getBool e2 tab) with
       | (_, Some b) when b -> Some true
       | (Some b, _) when (not b) -> Some true
       | (None, _) | (_, None) -> None
       | _ -> Some false
     end
   | Eq (e1, e2) -> begin
-      match (getBool e1, getBool e2) with
+      match (getBool e1 tab, getBool e2 tab) with
       | (None, _) | (_, None) -> None
       | (Some b1, Some b2) -> Some (b1=b2)
     end
@@ -117,19 +117,6 @@ let rec two_power = function 0 -> 1 | x -> 2 * two_power (x - 1)
 
 
 (*Fonctions Demandées*)
-
-let replace (f : exp) (i : node) (b : bool) : exp = 
-  let rec aux (e : exp) : exp =
-    match e with
-    | T b -> T b
-    | Var j -> if i = j then T b else Var j
-    | No e -> No (aux e)
-    | Et (e1, e2) -> Et (aux e1, aux e2)
-    | Ou (e1, e2) -> Ou (aux e1, aux e2)
-    | Im (e1, e2) -> Im (aux e1, aux e2)
-    | Eq (e1, e2) -> Eq (aux e1, aux e2)
-  in aux f
-
 let mk (i : int) (l : node) (k : node) : node =
   if l = k then l
   else
@@ -140,17 +127,20 @@ let mk (i : int) (l : node) (k : node) : node =
     u
 
 let build (f : exp) : node =
-  let rec aux (f : exp) (i : int) : node =
-    match getBool f with
-        | None -> begin
-            if i >= (!n) then failwith "exception de getBool"
-            else
-            let v0 = aux (replace f i false) (i+1) in
-            let v1 = aux (replace f i true) (i+1) in
-            mk i v0 v1
-          end
-        | Some b -> if b then 1 else 0
-  in aux f 0
+  let rec aux (f : exp) (i : int) (tab : bool option array): node =
+    match getBool f tab with
+    | None -> begin
+        if i >= (!n) then failwith "exception de getBool"
+        else
+          let v0 = tab.(i) <- Some false; aux f (i+1) tab in
+          let v1 = tab.(i) <- Some false; aux f (i+1) tab in
+          tab.(i) <- None;
+          mk i v0 v1
+      end
+    | Some b -> if b then 1 else 0
+  in
+  let tab = Array.init (!n) (function a -> None) in
+  aux f 0 tab
 
 let apply (op : node->node->node) (u1 : node) (u2 : node) : node =
   let g = Hashtbl.create (map_size*map_size) in
@@ -265,5 +255,5 @@ let big : exp = Eq(Et(Im(Var 0, Var 1), No(Var 4)), Im(Ou(No(Var 1), Var 3), Im(
 let main e i = n := i; initT(); initH(); print_endline (string_of_exp e ""); print_endline "Start Build ..."; 
   let x = build e in aff x; print_endline (string_of_int x)
 
-(*let _ = main big 5*)
+let _ = main big 5
 
