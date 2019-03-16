@@ -25,6 +25,20 @@ let eq (x : int) (y : int) : int =
 
 type exp = T of bool | Var of int | No of exp | Et of (exp * exp) | Ou of (exp * exp) | Im of (exp * exp) | Eq of (exp * exp)
 
+
+let rec string_of_exp (e : exp) (esp : string): string =
+  match e with
+  | T b -> string_of_bool b
+  | Var n -> "x" ^ string_of_int n
+  | No e -> "No(" ^ string_of_exp e (esp ^ "   ") ^ "\n" ^ esp ^ ")"
+  | Et (e1,e2) -> "\n" ^ esp ^ "Et(" ^ string_of_exp e1 (esp ^ "  ") ^ "," ^ string_of_exp e2 (esp ^ "  ") ^ ")"
+  | Ou (e1,e2) -> "\n" ^ esp ^ "Ou(" ^ string_of_exp e1 (esp ^ "  ") ^ "," ^ string_of_exp e2 (esp ^ "  ") ^ ")"
+  | Im (e1,e2) -> "\n" ^ esp ^ "Im(" ^ string_of_exp e1 (esp ^ "  ") ^ "," ^ string_of_exp e2 (esp ^ "  ") ^ ")"
+  | Eq (e1,e2) -> "\n" ^ esp ^ "Eq(" ^ string_of_exp e1 (esp ^ "  ") ^ "," ^ string_of_exp e2 (esp ^ "  ") ^ ")"
+
+(*Affiche les exp*)
+
+
 let rec getBool (e : exp) (tab : bool option array) : (bool option * exp) =
   match e with
   | T b -> (Some b, T b)
@@ -36,7 +50,7 @@ let rec getBool (e : exp) (tab : bool option array) : (bool option * exp) =
   | No e -> begin
       match getBool e tab with
       | (None, e) -> (None, No e)
-      | (Some b, _) -> (Some (not b), T b)
+      | (Some b, _) -> (Some (not b), T (not b))
     end
   | Et (e1, e2) -> begin
       match getBool e1 tab with
@@ -54,10 +68,10 @@ let rec getBool (e : exp) (tab : bool option array) : (bool option * exp) =
     end
   | Im (e1, e2) -> begin
       match getBool e1 tab with
-      | (Some b, e1) -> if b then getBool e2 tab else (Some true, T true)
+      | (Some b, _) -> if b then getBool e2 tab else (Some true, T true)
       | (None, e1) -> begin 
           match getBool e2 tab with
-          | (Some b, e2) -> if b then (Some true, T true) else (None, e1)
+          | (Some b, e2) -> if b then (Some true, T true) else (None, No e1)
           | (None, e2) -> (None, Im (e1,e2))
         end
     end
@@ -66,7 +80,7 @@ let rec getBool (e : exp) (tab : bool option array) : (bool option * exp) =
       | (None, e1) -> (None, Eq (e1, e2))
       | (Some b, e1) -> begin
           match getBool e2 tab with
-          | (None, e2) -> (None, Eq (e1,e2))
+          | (None, e2) -> (None, if b then e2 else (No e2))
           | (Some c, _) -> (Some (c=b), T (c = b)) 
         end
     end
@@ -94,8 +108,8 @@ let n : int ref = ref 0
 (** changement *)
 let initT () : unit = 
   begin
-    Hashtbl.add t 0 (!n + 1, 0, 0); 
-    Hashtbl.add t 1 (!n + 1, 0, 0)
+    Hashtbl.add t 0 (!n , 0, 0); 
+    Hashtbl.add t 1 (!n , 0, 0)
   end
 
 let add (i : int) (l : node) (k : node) : node = 
@@ -127,7 +141,12 @@ let lookup (i : int) (l : node) (k : node) : node =
 let insert (i : int) (l : node) (k : node) (u : node) : unit =
   Hashtbl.replace h (i,l,k) u
 
-let rec two_power = function 0 -> 1 | x -> 2 * two_power (x - 1)
+let two_power n = 
+  let rec aux i tmp =
+    if i <= 0 then tmp
+    else aux (i-1) (2*tmp)
+  in
+  aux n 1
 
 
 (*Fonctions Demandées*)
@@ -141,20 +160,20 @@ let mk (i : int) (l : node) (k : node) : node =
     u
 
 let build (f : exp) : node =
-  let rec aux (f : exp) (i : int) (tab : bool option array): node =
+  let tab = Array.init (!n) (function a -> None) in
+  let rec aux (f : exp) (i : int) : node =
     match getBool f tab with
-    | (None, f) -> begin
+    | (None, nf) -> begin
         if i >= (!n) then failwith "exception de getBool"
         else
-          let v0 = tab.(i) <- Some false; aux f (i+1) tab in
-          let v1 = tab.(i) <- Some false; aux f (i+1) tab in
+          let v0 = tab.(i) <- (Some false); aux nf (i+1) in
+          let v1 = tab.(i) <- (Some true); aux nf (i+1) in
           tab.(i) <- None;
           mk i v0 v1
       end
     | (Some b, _) -> if b then 1 else 0
   in
-  let tab = Array.init (!n) (function a -> None) in
-  aux f 0 tab
+  aux f 0
 
 let apply (op : node->node->node) (u1 : node) (u2 : node) : node =
   let g = Hashtbl.create (map_size*map_size) in
@@ -231,7 +250,13 @@ let simplify (d : node) (u : node) : node =
 let aff (n : node) : unit =
   let rec aux (n : node) (esp : string) : unit =
     print_string (esp ^ (string_of_int n));
-    if not(unite n) then begin print_endline (":" ^ (string_of_int (var n))); aux (low n) (esp ^ " |"); print_endline ""; aux (high n) (esp ^ "  ")end
+    if not(unite n) then 
+      begin 
+        print_endline (":" ^ (string_of_int (var n))); 
+        aux (low n) (esp ^ " |"); 
+        print_endline ""; 
+        aux (high n) (esp ^ "  ")
+      end
   in
   aux n "";
   print_endline ""
@@ -239,18 +264,6 @@ let aff (n : node) : unit =
 (*Affiche : node n : var n
                      low n
                      high n*)
-
-let rec string_of_exp (e : exp) (esp : string): string =
-  match e with
-  | T b -> string_of_bool b
-  | Var n -> "x" ^ string_of_int n
-  | No e -> "No(" ^ string_of_exp e (esp ^ "   ") ^ "\n" ^ esp ^ ")"
-  | Et (e1,e2) -> "\n" ^ esp ^ "Et(" ^ string_of_exp e1 (esp ^ "  ") ^ "," ^ string_of_exp e2 (esp ^ "  ") ^ ")"
-  | Ou (e1,e2) -> "\n" ^ esp ^ "Ou(" ^ string_of_exp e1 (esp ^ "  ") ^ "," ^ string_of_exp e2 (esp ^ "  ") ^ ")"
-  | Im (e1,e2) -> "\n" ^ esp ^ "Im(" ^ string_of_exp e1 (esp ^ "  ") ^ "," ^ string_of_exp e2 (esp ^ "  ") ^ ")"
-  | Eq (e1,e2) -> "\n" ^ esp ^ "Eq(" ^ string_of_exp e1 (esp ^ "  ") ^ "," ^ string_of_exp e2 (esp ^ "  ") ^ ")"
-
-(*Affiche les exp*)
 
 (*Test*)
 
@@ -267,7 +280,6 @@ let big : exp = Eq(Et(Im(Var 0, Var 1), No(Var 4)), Im(Ou(No(Var 1), Var 3), Im(
 (*(((A->B)^-E)<->((-BvD)->((A^-C)->(c<->(Ev-D)))))*)
 
 let main e i = n := i; initT(); initH(); print_endline (string_of_exp e ""); print_endline "Start Build ..."; 
-  let x = build e in aff x; print_endline (string_of_int x)
+  let x = build e in aff x; print_endline (string_of_int (satCount x)); allSat x
 
-let _ = main big 5
-
+(* let _ = main impl 3 *)
