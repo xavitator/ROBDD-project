@@ -54,7 +54,11 @@ let rec getBool (e : exp) (tab : bool option array) : (bool option * exp) =
     end
   | Et (e1, e2) -> begin
       match getBool e1 tab with
-      | (None, e1) -> (None, Et (e1,e2))
+      | (None, e1) ->  begin 
+          match getBool e2 tab with 
+          | (None, e2) -> (None, Et (e1, e2)) 
+          | (Some b, _) -> if (not b) then (Some false, T false) else (None, e1) 
+        end
       | (Some b, _) -> if b then getBool e2 tab else (Some false, T false)
     end
   | Ou (e1, e2) -> begin 
@@ -77,7 +81,11 @@ let rec getBool (e : exp) (tab : bool option array) : (bool option * exp) =
     end
   | Eq (e1, e2) -> begin
       match getBool e1 tab with
-      | (None, e1) -> (None, Eq (e1, e2))
+      | (None, e1) -> begin 
+          match getBool e2 tab with 
+          | (None, e2) -> (None, Eq (e1, e2)) 
+          | (Some b, _) -> if b then (None, e1) else (None, No e1) 
+        end
       | (Some b, e1) -> begin
           match getBool e2 tab with
           | (None, e2) -> (None, if b then e2 else (No e2))
