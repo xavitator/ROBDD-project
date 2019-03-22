@@ -38,7 +38,6 @@ let rec string_of_exp (e : exp) (esp : string): string =
 
 (*Affiche les exp*)
 
-
 let rec getBool (e : exp) (tab : bool option array) : (bool option * exp) =
   match e with
   | T b -> (Some b, T b)
@@ -167,7 +166,7 @@ let mk (i : int) (l : node) (k : node) : node =
     insert i l k u;
     u
 
-let build (f : exp) : node =
+let build (f : exp) : node = let jkl = ref 0 in
   let tab = Array.init (!n) (function a -> None) in
   let rec aux (f : exp) (i : int) : node =
     match getBool f tab with
@@ -179,7 +178,7 @@ let build (f : exp) : node =
           tab.(i) <- None;
           mk i v0 v1
       end
-    | (Some b, _) -> if b then 1 else 0
+    | (Some b, _) -> if b then begin (*jkl := !jkl + 1; if !jkl mod 1 = 0 then print_endline(string_of_int !jkl);*) 1 end else 0
   in
   aux f 0
 
@@ -287,7 +286,7 @@ let impl : exp = Im(Im(Im(Var 0, Var 1), Im(Var 1, Var 2)), Im(Var 0, Var 2));;
 let big : exp = Eq(Et(Im(Var 0, Var 1), No(Var 4)), Im(Ou(No(Var 1), Var 3), Im(Et(Var 0, No(Var 2)), Eq(Var 2, Ou(Var 4, No(Var 3))))));;
 (*(((A->B)^-E)<->((-BvD)->((A^-C)->(c<->(Ev-D)))))*)
 
-let main e i = n := i; initT(); initH(); print_endline (string_of_exp e ""); print_endline "Start Build ..."; 
-  let x = build e in aff x; print_endline (string_of_int (satCount x)); allSat x
+let main (e : exp) (i : int) : unit = n := i; initT(); initH(); print_endline (string_of_exp e ""); print_endline "Start Build ..."; 
+  let x = build e in aff x; print_endline (string_of_int (satCount x))(*; allSat x*)
 
-(* let _ = main impl 3 *)
+(*let _ = main tot 2*)

@@ -5,9 +5,9 @@ let n : int ref = ref 0;;
 
 let nb : int ref = ref 0;;
 
-let initn (i : int) : unit = n := i; nb := i*i
+(*let initn (i : int) : unit = n := i; nb := i*i*)
 
-let v (x : int) : (int*int*int) = let (k,l) = (x mod (!nb),x/(!nb)) in let (i,j) = (l mod (!nb),l/(!nb)) in (k,i,l)
+(*let v (x : int) : (int*int*int) = let (k,l) = (x mod (!nb),x/(!nb)) in let (i,j) = (l mod (!nb),l/(!nb)) in (k,i,l)*)
 
 (*^[0<=i<=8]^[0<=j<=8](v[0<=k<=8]p(k,i,j)^^[0<=k<=8](^[0<=u<=8;0<=v<=8;(u,v)!=(i,j)](-p(k,i,j)v-p(k,u,v))^^[...](-p(k,i,j)v-p(k,u,v))))*)
 
@@ -58,11 +58,10 @@ let sudoku n =
     else Et(e, eti (i+1))
   in eti 0
 
-let main_sudo n = initn n; main (sudoku n) (n*n*n*n*n*n) (*sudoku 1 -> Et(Var 0, Et(T true, T true))*)
-							(*sudoku 2 -> 638 solutions*)
+let main_sudo n = (*initn n;*) main (sudoku n) (n*n*n*n*n*n) (*sudoku 1 -> Et(Var 0, Et(T true, T true))*)
+							(*sudoku 2 -> 288 solutions*)
 
-let _ = main_sudo 2
-
+let _ = main_sudo 3
 
 
 
