@@ -1,7 +1,7 @@
 #!/bin/bash
 #compiler:
 
-ocamlc -o sudoku implementation.ml sudoku.ml
+ocamlc -o sudoku implementation.mli implementation.ml sudoku.ml
 
 #effacer les fichiers auxilliaires :
 

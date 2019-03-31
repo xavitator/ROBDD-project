@@ -178,7 +178,7 @@ let build (f : exp) : node = let jkl = ref 0 in
           tab.(i) <- None;
           mk i v0 v1
       end
-    | (Some b, _) -> if b then begin (*jkl := !jkl + 1; if !jkl mod 1 = 0 then print_endline(string_of_int !jkl);*) 1 end else 0
+    | (Some b, _) -> if b then begin jkl := !jkl + 1; if !jkl mod 100 = 0 then print_endline(string_of_int !jkl);(**) 1 end else 0
   in
   aux f 0
 
