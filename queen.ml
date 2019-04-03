@@ -98,4 +98,4 @@ let create_all n =
 
 let main_queen n = main (create_all n) (n * n)
 
-let _ = main_queen 8 "height_queen.dot"
+let _ = main_queen 4 "height_queen.dot"
