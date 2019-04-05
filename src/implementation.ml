@@ -101,12 +101,14 @@ struct
 
   let initT () : unit = 
     begin
+      Hashtbl.clear t;
       Hashtbl.add t 0 (0, 0, 0); 
       Hashtbl.add t 1 (1, 0, 0)
     end
 
   let initH () : unit  =
     begin
+      Hashtbl.clear h;
       Hashtbl.add h (0, 0, 0) 0; 
       Hashtbl.add h (1, 1, 1) 1
     end
@@ -245,8 +247,8 @@ struct
       let u = add i l k in
       insert i l k u;
       let node = (u, Interface.t_to_string !var_tab.(i)) in
-      let nodel = (l, Interface.t_to_string !var_tab.(l)) in
-      let nodek = (k, Interface.t_to_string !var_tab.(k)) in
+      let nodel = (l, "") in (** ici le nom de la node n'a pas d'importance vu que la node existe déjà dans le graphe sous un autre nom **)
+      let nodek = (k, "") in (** ici le nom de la node n'a pas d'importance vu que la node existe déjà dans le graphe sous un autre nom **)
       Graph.add_node node;
       Graph.add_node nodel;
       Graph.add_node nodek;
@@ -261,11 +263,12 @@ struct
       match getBool f tab with
       | (None, nf) -> begin
           if i >= (!n) then failwith "exception de getBool"
-          else
+          else begin
             let v0 = tab.(i) <- (Some false); aux nf (i+1) in
             let v1 = tab.(i) <- (Some true); aux nf (i+1) in
             tab.(i) <- None;
             mk i v0 v1
+          end
         end
       | (Some b, _) -> 
         if b then 
@@ -365,7 +368,7 @@ struct
     n := i; 
     initT();
     initH();
-    let x = build e in 
+    let x = build e in
     Graph.output_file name;
     aff x;
     print_endline (string_of_int (satCount x))(*; allSat x*)
