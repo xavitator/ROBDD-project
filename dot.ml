@@ -42,7 +42,7 @@ struct
     let aux a b tmp =
       (tmp ^ " " ^ (string_of_int b))
     in
-    "{rank=same" ^ (Hashtbl.fold aux hshtbl "") ^ "}\n"
+    "  {rank=same" ^ (Hashtbl.fold aux hshtbl "") ^ "}\n"
 
   let all_rank () =
     Hashtbl.fold (fun a b c -> c ^ (same_rank b)) table ""
@@ -52,39 +52,32 @@ struct
     Dot.output_graph file !g; 
     seek_out file (pos_out file - 1);
     output_string file (all_rank ());
-    output_string file "{rank=same 0 1}\n";
+    if(Hashtbl.mem content 1 && Hashtbl.mem content 0) then output_string file "  {rank=same 0 1}\n";
     output_string file " }";
     g := G.empty
 
-  let add_node_only el =
-    print_int (fst el); print_endline "";
+  let add_node el =
     if Hashtbl.mem content (fst el) = false then begin
-      let (i, name) = el in 
+      let (i, name) = el in
       begin
-        print_endline name;
         if Hashtbl.mem table name then Hashtbl.add (Hashtbl.find table name) i i
         else 
           begin
-            let contentu = Hashtbl.create 4096 in begin
-              Hashtbl.add contentu i i;
-              Hashtbl.replace table name contentu
+            let contenu = Hashtbl.create 4096 in 
+            begin
+              Hashtbl.add contenu i i;
+              Hashtbl.replace table name contenu
             end
           end;
         let node = G.V.create el in
         g := G.add_vertex !g node;
         Hashtbl.replace content (fst el) node
       end
-    end; ()
-
-  let add_node el =
-    add_node_only el;
-    Hashtbl.find content (fst el)
+    end
 
   let add_liaison n1 n2 =
-    let node1 = add_node n1 in
-    let node2 = add_node n2 in
+    let node1 = Hashtbl.find content (fst n1) in
+    let node2 = Hashtbl.find content (fst n2) in
     g := G.add_edge !g node1 node2
 
-
-  let () = add_node_only (0,"false"); add_node_only (1, "true")
 end
