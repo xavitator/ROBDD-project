@@ -47,3 +47,15 @@ circuits combinatiores, etc
 Lors de l'utilisation de notre algorithme, on génère un graphe.
 
 On peut obtenir le rendu de ce graphe. Pour cela, on a besoin d'avoir le package `ocamlgraph` d'installer sur son ordinateur.
+
+## Compilation 
+
+Il faut au préalable vérifier que `make` est installé.
+
+Ensuite, il vous faut télécharger le dépot, puis lancer la commande :
+
+```
+    make help
+```
+
+Et vous suivez les instructions fournies.
