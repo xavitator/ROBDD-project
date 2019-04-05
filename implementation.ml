@@ -190,7 +190,14 @@ let build (f : exp) : node =
           tab.(i) <- None;
           mk i v0 v1
       end
-    | (Some b, _) -> if b then begin (*jkl := !jkl + 1; if !jkl mod 1 = 0 then print_endline(string_of_int !jkl);*) Graph.add_node (1, "true"); 1 end else (Graph.add_node (0, "false"); 0)
+    | (Some b, _) -> 
+      if b then 
+        begin 
+          (*jkl := !jkl + 1; if !jkl mod 1 = 0 then print_endline(string_of_int !jkl);*) 
+          Graph.add_node (1, "true"); 1 
+        end 
+      else 
+        (Graph.add_node (0, "false"); 0)
   in
   aux f 0
 
