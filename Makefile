@@ -28,6 +28,11 @@ SUDOKU_FILE = src/sudoku.ml
 MLI_FILES = \
 		src/implementation.mli
 
+ALL_FILES = $(ML_FILES) \
+		$(BENCH_FILE) \
+		$(QUEEN_FILE) \
+		$(SUDOKU_FILE)
+
 PACKS = ocamlgraph
 
 SOURCES = $(MLI_FILES) $(ML_FILES)
@@ -69,6 +74,7 @@ exec: $(RESULT)
 
 .PHONY: fclean
 fclean: clean-all
+	rm -f $(ALL_FILES:%.ml=%.o) $(ALL_FILES:%.ml=%.cmi) $(ALL_FILES:%.ml=%.cmx)
 	rm -f $(TAR)
 
 .PHONY: re
