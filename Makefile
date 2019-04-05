@@ -8,7 +8,8 @@ TAR_DIR = $(basename $(basename $(TAR)))
 
 ML_FILES = \
 		src/dot.ml \
-		src/implementation.ml
+		src/implementation.ml \
+		src/test.ml
 
 LY_DIR = src/lex_parser
 
@@ -24,9 +25,6 @@ BENCH_MLI_FILE = $(LY_DIR)/parser.mli
 QUEEN_FILE = src/queen.ml
 
 SUDOKU_FILE = src/sudoku.ml
-
-MLI_FILES = \
-		src/implementation.mli
 
 ALL_FILES = $(ML_FILES) \
 		$(BENCH_FILE) \

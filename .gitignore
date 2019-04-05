@@ -25,3 +25,10 @@ setup.log
 .merlin
 
 robdd
+clear.sh
+lance.sh
+moi/
+test/
+
+# fichiers des graphes 
+*.dot

@@ -58,11 +58,12 @@ let sudoku n =
     else Et(e, eti (i+1))
   in eti 0
 
+
 let main_sudo n = (*initn n;*) main (sudoku n) (n*n*n*n*n*n) (string_of_int n ^ "_sudoku.dot")
 (*sudoku 1 -> Et(Var 0, Et(T true, T true))*)
 (*sudoku 2 -> 288 solutions*)
-
-let _ = main_sudo 3
+let main3 = main (Et(Et(Var 0,Et(Var 10,Et(Var 20,Et(Var 30,Et(Var 40,Et(Var 50,Et(Var 60,Et(Var 70,Var 80)))))))),sudoku 3)) (3*3*3*3*3*3) ("3_sudoku.dot")
+let _ = main3
 
 
 
