@@ -24,22 +24,22 @@ let sudoku n =
       let rec etk k =
         let rec eti2 i2 =
           if i = i2 then if i = nb-1 then T true else eti2 (i2+1) else
-          let e = No(Var (p k i2 j)) in
-          if i2 = nb-1 then e
-          else Et(e, eti2 (i2+1))
+            let e = No(Var (p k i2 j)) in
+            if i2 = nb-1 then e
+            else Et(e, eti2 (i2+1))
         in
         let rec etj2 j2 =
           if j = j2 then if j = nb-1 then T true else etj2 (j2+1) else
-          let e = No(Var (p k i j2)) in
-          if j2 = nb-1 then e
-          else Et(e, etj2 (j2+1))
+            let e = No(Var (p k i j2)) in
+            if j2 = nb-1 then e
+            else Et(e, etj2 (j2+1))
         in
         let rec eti3 i3 =
           let rec etj3 j3 =
             if i = i3 && j = j3 then if j = n*(j/n+1)-1 then T true else etj3 (j3+1) else
-            let e = No(Var (p k i3 j3)) in
-            if j3 = n*(j/n+1)-1 then e
-            else Et(e, etj3 (j3+1))
+              let e = No(Var (p k i3 j3)) in
+              if j3 = n*(j/n+1)-1 then e
+              else Et(e, etj3 (j3+1))
           in
           let e = etj3 (n*(j/n)) in
           if i3 = n*(i/n+1)-1 then e
@@ -58,8 +58,9 @@ let sudoku n =
     else Et(e, eti (i+1))
   in eti 0
 
-let main_sudo n = (*initn n;*) main (sudoku n) (n*n*n*n*n*n) (*sudoku 1 -> Et(Var 0, Et(T true, T true))*)
-							(*sudoku 2 -> 288 solutions*)
+let main_sudo n = (*initn n;*) main (sudoku n) (n*n*n*n*n*n) (string_of_int n ^ "_sudoku.dot")
+(*sudoku 1 -> Et(Var 0, Et(T true, T true))*)
+(*sudoku 2 -> 288 solutions*)
 
 let _ = main_sudo 3
 
