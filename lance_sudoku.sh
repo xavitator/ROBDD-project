@@ -1,7 +1,7 @@
 #!/bin/bash
 #compiler:
 
-ocamlc -o sudoku implementation.ml sudoku.ml
+ocamlfind ocamlopt -linkpkg -package ocamlgraph -o sudoku dot.ml implementation.mli implementation.ml sudoku.ml
 
 #effacer les fichiers auxilliaires :
 

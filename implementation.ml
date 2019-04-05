@@ -156,17 +156,29 @@ let two_power n =
   aux n 1
 
 
+module Graph = Dot.MakeDot (struct let is_lower a b = low a = b let is_unite = unite end)    
+
 (*Fonctions Demandées*)
 let mk (i : int) (l : node) (k : node) : node =
   if l = k then l
   else
-  if member i l k then lookup i l k
+  if member i l k then 
+    lookup i l k
   else
     let u = add i l k in
     insert i l k u;
+    let node = (u, string_of_int i) in
+    let nodel = (l, string_of_int l) in
+    let nodek = (k, string_of_int k) in
+    Graph.add_node node;
+    Graph.add_node nodel;
+    Graph.add_node nodek;
+    Graph.add_liaison node nodek;
+    Graph.add_liaison node nodel;
     u
 
-let build (f : exp) : node = let jkl = ref 0 in
+let build (f : exp) : node = 
+  (* let jkl = ref 0 in *)
   let tab = Array.init (!n) (function a -> None) in
   let rec aux (f : exp) (i : int) : node =
     match getBool f tab with
@@ -178,7 +190,14 @@ let build (f : exp) : node = let jkl = ref 0 in
           tab.(i) <- None;
           mk i v0 v1
       end
-    | (Some b, _) -> if b then begin (*jkl := !jkl + 1; if !jkl mod 1 = 0 then print_endline(string_of_int !jkl);*) 1 end else 0
+    | (Some b, _) -> 
+      if b then 
+        begin 
+          (*jkl := !jkl + 1; if !jkl mod 1 = 0 then print_endline(string_of_int !jkl);*) 
+          Graph.add_node (1, "true"); 1 
+        end 
+      else 
+        (Graph.add_node (0, "false"); 0)
   in
   aux f 0
 
@@ -272,6 +291,7 @@ let aff (n : node) : unit =
                      low n
                      high n*)
 
+
 (*Test*)
 
 let tot : exp = Eq(Et(Im(Var 1, No(Var 0)), Ou(Var 0, No(Var 1))), No(Var 1));;
@@ -286,7 +306,14 @@ let impl : exp = Im(Im(Im(Var 0, Var 1), Im(Var 1, Var 2)), Im(Var 0, Var 2));;
 let big : exp = Eq(Et(Im(Var 0, Var 1), No(Var 4)), Im(Ou(No(Var 1), Var 3), Im(Et(Var 0, No(Var 2)), Eq(Var 2, Ou(Var 4, No(Var 3))))));;
 (*(((A->B)^-E)<->((-BvD)->((A^-C)->(c<->(Ev-D)))))*)
 
-let main (e : exp) (i : int) : unit = n := i; initT(); initH(); print_endline (string_of_exp e ""); print_endline "Start Build ..."; 
-  let x = build e in aff x; print_endline (string_of_int (satCount x))(*; allSat x*)
+let main (e : exp) (i : int) (name : string): unit = 
+  n := i; 
+  initT();
+  initH();
+  print_endline (string_of_exp e "");
+  print_endline "Start Build ...";
+  let x = build e in Graph.output_file name;
+  aff x;
+  print_endline (string_of_int (satCount x))(*; allSat x*)
 
-(*let _ = main tot 2*)
+let _ = main tot 2 "test1.dot"

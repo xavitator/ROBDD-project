@@ -36,8 +36,14 @@ circuits combinatiores, etc
 
 ## Exemples de problèmes résolus avec un ROBDD
 
-### The 8 Queens problem
+### Le problème des N dames
 
-### Correctness of Combinational Circuits
+### Sudoku
 
-### Equivalence of Combinational Circuits
+### Benchmarks
+
+## Représentation graphique des ROBDD
+
+Lors de l'utilisation de notre algorithme, on génère un graphe.
+
+On peut obtenir le rendu de ce graphe. Pour cela, on a besoin d'avoir le package `ocamlgraph` d'installer sur son ordinateur.

@@ -96,6 +96,6 @@ let create_all n =
   in
   Et (one, impl)
 
-let main_queen n = main (create_all n) (n * n)
+let main_queen n = main (create_all n) (n * n) (string_of_int n ^ "_queen.dot")
 
-let _ = main_queen 8
+let _ = main_queen 4

@@ -3,7 +3,7 @@
 
 ocamllex lexer.mll
 ocamlyacc parser.mly
-ocamlc -o bench implementation.mli implementation.ml parser.mli parser.ml lexer.ml bench.ml
+ocamlfind ocamlopt -linkpkg -package ocamlgraph -o bench dot.ml implementation.mli implementation.ml parser.mli parser.ml lexer.ml bench.ml
 
 #effacer les fichiers auxilliaires :
 

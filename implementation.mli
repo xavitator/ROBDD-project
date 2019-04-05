@@ -8,4 +8,4 @@ type exp =
   | Eq of (exp * exp)
 
 val main :
-  exp -> int -> unit
+  exp -> int -> string -> unit

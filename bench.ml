@@ -7,14 +7,13 @@ let main (channel : string) : unit =
   try
     let lexbuf = Lexing.from_channel std in
     let (n,e) = Parser.main Lexer.token lexbuf in
-    Implementation.main e n
+    Implementation.main e n (channel ^ "_file.dot")
   with _ -> print_endline "Fin !"
 ;;
 
 if !Sys.interactive
 then ()
-else
-  if Array.length Sys.argv <> 2
-  then print_endline "Usage: calc <file>"
-  else main Sys.argv.(1)
+else if Array.length Sys.argv <> 2 then 
+  print_endline "Usage: calc <file>"
+else main Sys.argv.(1)
 ;;

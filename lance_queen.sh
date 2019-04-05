@@ -1,7 +1,7 @@
 #!/bin/bash
 #compiler:
 
-ocamlc -o queen implementation.ml queen.ml
+ocamlfind ocamlopt -linkpkg -package ocamlgraph -o queen dot.ml implementation.mli implementation.ml queen.ml
 
 #effacer les fichiers auxilliaires :
 
