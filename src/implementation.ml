@@ -135,8 +135,8 @@ let high (u : node) : node =
 
 let initH () : unit  =
   begin
-    Hashtbl.add h (!n + 1, 0, 0) 0; 
-    Hashtbl.add h (!n + 1, 0, 0) 1
+    Hashtbl.add h (!n, 0, 0) 0; 
+    Hashtbl.add h (!n, 0, 0) 1
   end
 
 let member (i : int) (l : node) (k : node) : bool =
