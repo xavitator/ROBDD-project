@@ -306,7 +306,14 @@ let impl : exp = Im(Im(Im(Var 0, Var 1), Im(Var 1, Var 2)), Im(Var 0, Var 2));;
 let big : exp = Eq(Et(Im(Var 0, Var 1), No(Var 4)), Im(Ou(No(Var 1), Var 3), Im(Et(Var 0, No(Var 2)), Eq(Var 2, Ou(Var 4, No(Var 3))))));;
 (*(((A->B)^-E)<->((-BvD)->((A^-C)->(c<->(Ev-D)))))*)
 
-let main (e : exp) (i : int) (name : string): unit = n := i; initT(); initH(); print_endline (string_of_exp e ""); print_endline "Start Build ..."; 
-  let x = build e in Graph.output_file name; aff x; print_endline (string_of_int (satCount x))(*; allSat x*)
+let main (e : exp) (i : int) (name : string): unit = 
+  n := i; 
+  initT();
+  initH();
+  print_endline (string_of_exp e "");
+  print_endline "Start Build ...";
+  let x = build e in Graph.output_file name;
+  aff x;
+  print_endline (string_of_int (satCount x))(*; allSat x*)
 
 let _ = main tot 2 "test1.dot"
