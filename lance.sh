@@ -5,7 +5,7 @@ ocamlfind ocamlopt -linkpkg -package ocamlgraph -o implementation dot.ml impleme
 
 #effacer les fichiers auxilliaires :
 
-rm -f *.cmi *.cmo
+rm -f *.cmi *.cmo *.cmx *.o
 
 #Lance le jeu
  

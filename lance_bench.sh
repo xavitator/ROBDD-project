@@ -7,4 +7,4 @@ ocamlfind ocamlopt -linkpkg -package ocamlgraph -o bench dot.ml implementation.m
 
 #effacer les fichiers auxilliaires :
 
-rm -f *.cmi *.cmo
+rm -f *.cmi *.cmo *.cmx *.o
