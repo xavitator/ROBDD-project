@@ -1,0 +1,76 @@
+\documentclass[a4paper, oneside]{report}
+\usepackage{amsfonts,amsmath,amssymb}
+\usepackage[utf8]{inputenc}
+\usepackage[francais]{babel}
+\usepackage{graphicx}
+\usepackage{polynom}
+\usepackage[T1]{fontenc}
+\usepackage{mathenv}
+\usepackage{array}
+\usepackage{mdwtab}
+\usepackage[colorlinks=true,linkcolor=black]{hyperref}
+\frenchbsetup{StandardLists=true}
+
+\begin{document}
+
+
+\title{Diagramme de décision binaire - ROBDD \\ Rapport pour le projet Mathématique et Informatique de L3 de 2018-2019  }
+\date{\today}
+\author{Sébastien Palmer et Xavier Durand \\~\\ Encadré par Sedki Boughattas }
+\maketitle
+
+\tableofcontents{}
+
+\newpage
+
+%%%%% INTRODUCTION %%%%%%%
+\chapter*{Introduction}
+\addcontentsline{toc}{chapter}{Introduction}
+
+\section*{Présentation du sujet}
+\section*{Qu'est ce qu'une expression propositionnelle}
+\section*{Qu'est ce qu'une ROBDD (présentation rapide)}
+\section*{Problématique}
+\section*{plan}
+
+
+%%%%% Chapitre 1 %%%%%%%
+\chapter{Représentation sous ROBDD}
+
+\section{Système complet de $\varphi$}
+\section{démo de l'existence}
+\section{démo de l'unicité}
+\section{A quoi correspond le graphe, et rapport avec $\varphi$}
+\section{Représentation correcte -> pas de perte d'informations}
+
+%%%%% Chapitre 2 %%%%%%%
+\chapter{Construction d'une ROBDD}
+
+\section{présentation de l'algorithme}
+\section{Présentation de l'algo}
+\section{exemple d'exécution de l'algo}
+\section{Etude des complexités}
+
+%%%%% Chapitre 3 %%%%%%%
+\chapter{Intérêt et optimisation}
+
+\section{Raison de la ROBDD}
+\section{Utilisation possible comme Sat-solveur mais mauvais}
+\section{Théorie sur les ordres}
+
+%%%%% Conclusion %%%%%%%
+\chapter*{Conclusion}
+\addcontentsline{toc}{chapter}{Conclusion}
+
+\section*{Nouvelle approche d'une expression propositionnelle}
+\section*{Optimisation que cela apporte en fonction de l'ordre}
+\section*{Représentation simple d'une expression prop}
+\section*{Théorie développée et approche de recherche pour les ordres}
+\section*{Ce que le projet nous a apporté}
+
+%%%%% Bibliographie %%%%%%%
+\chapter*{Bibliographie}
+\addcontentsline{toc}{chapter}{Bibliographie}
+Ajouter les différents articles sur lesquels on s'est basé.
+
+\end{document}
