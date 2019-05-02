@@ -24,7 +24,7 @@ let big : int exp = Eq(Et(Im(Var 0, Var 1), No(Var 4)), Im(Ou(No(Var 1), Var 3),
 (*(((A->B)^-E)<->((-BvD)->((A^-C)->(c<->(Ev-D)))))*)
 
 
-let main (e : Test_exp.t exp) (str : string): unit = T.main_expression e (str ^ ".dot")
+let main (e : Test_exp.t exp) (str : string): unit = T.re_init (); T.main_expression e (str ^ ".dot")
 
 let _ = main tot "tot"
 let _ = main ant "ant"

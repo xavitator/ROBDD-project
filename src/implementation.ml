@@ -37,6 +37,7 @@ struct
 
   let var_tab = ref [||]
 
+  let node_to_var = ref [(1,0); (0,0)]
 
   (******************** Fonctions de Language Binaire avec des nodes **************)
 
@@ -149,6 +150,15 @@ struct
     else if List.mem (!var_tab.(i), true) li || List.mem (!var_tab.(i), false) li then fill_var (i+1) ((!var_tab.(i), true) :: li)
     else fill_var (i+1) li
 
+  let add_new_node n i =
+    node_to_var := (n,i) :: !node_to_var 
+
+  let re_init () =
+    n := 0;
+    var_tab := [||];
+    node_to_var := [(1,0); (0,0)];
+    initH();
+    initT()
 
   (************************ Fonctions d'affichage *****************************)
 
@@ -246,6 +256,7 @@ struct
     else
       let u = add i l k in
       insert i l k u;
+      add_new_node u (i + 1);
       let node = (u, Interface.t_to_string !var_tab.(i)) in
       let nodel = (l, "") in (** ici le nom de la node n'a pas d'importance vu que la node existe déjà dans le graphe sous un autre nom **)
       let nodek = (k, "") in (** ici le nom de la node n'a pas d'importance vu que la node existe déjà dans le graphe sous un autre nom **)
@@ -319,13 +330,22 @@ struct
     aux u
 
   let satCount (u : node) : int =
-    let rec aux (u : node) : int =
-      if u = 0 then 0
-      else if u = 1 then 1
-      else 
-        two_power (var (low u) - var u - 1) * aux (low u) +
-        two_power (var (high u) - var u - 1) * aux (high u)
-    in aux u
+    let tmp = Array.of_list (List.rev !node_to_var) in
+    let node_of_var = Array.init (Array.length tmp) (fun i -> snd tmp.(i)) in
+    let rec aux (u : node)  = 
+      if u = 0 then (0,0)
+      else if u = 1 then (0,1)
+      else
+        let ind = node_of_var.(u) in
+        let som = 
+          let (i,res) = aux (low u) in two_power (i - ind) * res 
+                                       +
+                                       let (i, res) = aux (high u) in two_power (i - ind) * res
+        in (ind, som)
+    in
+    if u = 0 then 0
+    else if u = 1 then two_power (Array.length !var_tab)
+    else let (i,res) = aux u in two_power (i - 1) * res
 
   (** A modifier pour qu'il ne fasse qu'une partie du build jusqu'à la premiere solution trouvée **)
   let rec anySat (u : node) : (Interface.t * bool) list =
