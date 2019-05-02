@@ -11,6 +11,14 @@
 \usepackage[colorlinks=true,linkcolor=black]{hyperref}
 \frenchbsetup{StandardLists=true}
 
+
+
+\newcommand{\adb}{arbre~de~décision binaire~}
+\newcommand{\adbs}{arbres~de~décision binaires~}
+\newcommand{\expp}{expression~propositionnelle~}
+\newcommand{\expps}{expressions~propositionnelles~}
+\newcommand{\ssi}{si~et~seulement~si~}
+
 \begin{document}
 
 
@@ -28,8 +36,106 @@
 \addcontentsline{toc}{chapter}{Introduction}
 
 \section*{Présentation du sujet}
+Ce document est un projet de Mathématiques et d'Informatique suivi et encadré par un enseignant chercheur à l'Université Paris Diderot.\\
+Nous allons ici traiter des arbres de décisions binaires. Le projet se base sur l'article de Henrik Reif Andersen \og\textit{An Introduction to Binary Decision Diagrams}\fg{}.\\
+Ce document traite de ce qu'est un arbre de décision binaire, et de la représentation de toutes expressions propositionnelles en un arbre de décision binaire. Enfin, il expose un algorithme permettant de construire l'\adb correspondant à une expression propositionnelle quelconque.\\
+
 \section*{Qu'est ce qu'une expression propositionnelle}
+
+Dans un premier temps, on va présenter ce qu'est une expression propositionnelle.\\
+\subsubsection*{Variable propositionnelle}
+Une variable propositionnelle correspond à une variable comme en Mathématiques. Cependant, son ensemble de définition correspond à l'ensemble $\{0,1\}$, où ici on peut apparenter $0$ à \textit{faux} et $1$ à \textit{vrai}.\\
+Pour lier différentes variables propositionnelles entre elles, on va introduire des connecteurs logiques.
+\subsubsection*{Connecteurs logiques}
+On va présenter ici les cinq symboles logiques les plus utilisés en logique propositionnelle :
+\begin{itemize}
+\item la négation : on la notera $\neg$. Elle correspond à une fonction ne prenant qu'une expression propositionnelle en argument et renvoie vrai \ssi l'argument est faux.
+
+\item la conjonction : on la notera $\wedge$. Elle correspond à une fonction prenant deux \expps en argument et renvoie vrai \ssi les deux arguments sont vrais. 
+
+\item la disjonction : on la notera $\vee$. Elle correspond à une fonction prenant deux \expps en argument et renvoie faux \ssi les deux arguments sont faux (donc renvoie vrai si au moins l'un des deux arguments est vrai).
+
+\item l'implication : on la notera $\Rightarrow$. C'est une fonction prenant deux \expps en arguments et renvoyant faux \ssi le premier argument est vrai et le deuxième est faux.
+
+\item l'équivalence : on la notera $\Leftrightarrow$. C'est une fonction prenant deux \expps en argument et renvoyant vrai \ssi les deux arguments ont la même valeur de vérité.
+
+\end{itemize}
+
+Voici les tables de vérités de chacun des connecteurs logiques :
+\begin{figure}[h]
+\begin{center}
+\begin{tabular}[t]{|c|c|}
+\hline 
+ & $\neg$ \\ 
+\hline 
+$0$ & $1$\\
+$1$ & $0$ \\ 
+\hline 
+\end{tabular}
+\hspace*{1em}
+\begin{tabular}{|c|c|c|c|c|c|}
+\hline 
+\multicolumn{2}{|c|}{} &  &  &  &  \\ 
+\hline 
+\multicolumn{2}{|c|}{} &  &  &  &  \\ 
+\hline 
+\end{tabular} 
+\begin{tabular}[t]{|c|cc|}
+\hline 
+$\wedge$ & $0$ & $1$ \\ 
+\hline 
+$0$ & $0$ & $0$\\
+$1$ & $0$ & $1$ \\ 
+\hline 
+\end{tabular}
+\hspace*{1em}
+\begin{tabular}[t]{|c|cc|}
+\hline 
+$\vee$ & $0$ & $1$ \\ 
+\hline 
+$0$ & $0$ & $1$\\
+$1$ & $1$ & $1$ \\ 
+\hline 
+\end{tabular}
+\hspace*{1em}
+\begin{tabular}[t]{|c|cc|}
+\hline 
+$\Rightarrow$ & $0$ & $1$ \\ 
+\hline 
+$0$ & $1$ & $1$\\
+$1$ & $0$ & $1$ \\ 
+\hline 
+\end{tabular}
+\hspace*{1em}
+\begin{tabular}[t]{|c|cc|}
+\hline 
+$\Leftrightarrow$ & $0$ & $1$ \\ 
+\hline 
+$0$ & $1$ & $0$\\
+$1$ & $0$ & $1$ \\ 
+\hline 
+\end{tabular}
+\end{center}
+\caption{Tables de vérités des cinq connecteurs logiques}
+\end{figure}
+
+Ces connecteurs logiques ne sont bien évidemment pas les seuls à exister, mais ce sont ceux qu'on accepte dans notre algorithme qu'on présentera plus tard.
+
+\subsubsection{Expression propositionnelle}
+Une \expp correspond à une suite de variables propositionnelles liées par des connecteurs logiques.\\
+Voici un exemple d'\expp :
+$$(x \wedge y) \vee ((\neg z) \Rightarrow (x \Leftrightarrow t))$$
+avec $x,y,z$ et $t$ des variables propositionnelles.\\
+
+Par soucis de lisibilité, lorsqu'on écrira une expression propositionnelle, on ajoutera des parenthèses.\\
+Prenons l'expression $x\wedge y\vee 1$. On ne va pas avoir la même table de vérité si on écrit $(x\wedge y)\vee 1$ (qui sera toujours vrai) et si on écrit $x \wedge (y \vee 1)$ (qui sera faux si $x$ est faux).\\
+Cependant, il y a des expressions qui sont commutatives, et donc on peut omettre les parenthèses dans ces cas précis. Ces expressions commutatives sont la succession de conjonction et la succession de disjonction. Les tables de vérité des deux \expps suivantes ne change pas quelque soit la position des parenthèses :
+$$x \wedge y \wedge z \hspace{2em} et \hspace{2em} x \vee y \vee z$$
+
 \section*{Qu'est ce qu'une ROBDD (présentation rapide)}
+
+
+
 \section*{Problématique}
 \section*{plan}
 
