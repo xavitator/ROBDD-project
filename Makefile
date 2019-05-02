@@ -8,7 +8,8 @@ TAR_DIR = $(basename $(basename $(TAR)))
 
 ML_FILES = \
 		src/dot.ml \
-		src/implementation.ml
+		src/implementation.ml \
+		src/test.ml
 
 LY_DIR = src/lex_parser
 
@@ -24,9 +25,6 @@ BENCH_MLI_FILE = $(LY_DIR)/parser.mli
 QUEEN_FILE = src/queen.ml
 
 SUDOKU_FILE = src/sudoku.ml
-
-MLI_FILES = \
-		src/implementation.mli
 
 ALL_FILES = $(ML_FILES) \
 		$(BENCH_FILE) \
@@ -45,6 +43,9 @@ help:
 	@printf "Useful commands for this Makefile:\\n"
 	@printf " - help : prints this message\\n"
 	@printf " - robdd : compile all\\n"
+	@printf " - queen : compile queen\\n"
+	@printf " - sudoku : compile sudoku\\n"
+	@printf " - bench : compile bench\\n"
 	@printf " - exec : compiles and runs\\n"
 	@printf " - bytecode (bc) : compiles in bytecode\\n"
 	@printf " - nativecode (nc) : compiles in nativecode\\n"

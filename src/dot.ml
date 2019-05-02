@@ -25,9 +25,9 @@ struct
   module Dot = Graph.Graphviz.Dot(struct
       include G (* use the graph module from above *)
       let edge_attributes (a,e,b) = if Comparator.is_lower (fst a) (fst b) then [`Style `Dotted] else [`Style `Solid]
-      let default_edge_attributes _ = [`Arrowhead `None]
+      let default_edge_attributes _ = []
       let get_subgraph _ = None
-      let vertex_attributes (i, name) = if Comparator.is_unite i = false then [`Label name] else [`Label (if i = 0 then "false" else "true")]
+      let vertex_attributes (i, name) = if Comparator.is_unite i = false then [`Label name] else [`Label (if i = 0 then "false" else "true"); `Shape `Box]
       let vertex_name (i,name) = string_of_int i
       let default_vertex_attributes _ = []
       let graph_attributes _ = []

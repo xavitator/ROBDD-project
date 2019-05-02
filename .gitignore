@@ -32,3 +32,10 @@ setup.log
 *.toc
 
 robdd
+clear.sh
+lance.sh
+moi/
+test/
+
+# fichiers des graphes 
+*.dot
