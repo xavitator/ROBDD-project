@@ -1,6 +1,7 @@
 
 OCAMLMAKEFILE = OCamlMakefile
 
+RAPPORT_EXP = rapport/exemple
 RESULT = robdd
 
 TAR = palmer_durand.tar.gz
@@ -9,7 +10,8 @@ TAR_DIR = $(basename $(basename $(TAR)))
 ML_FILES = \
 		src/dot.ml \
 		src/implementation.ml \
-		src/test.ml
+		src/worse.ml\
+		src/test.ml 
 
 LY_DIR = src/lex_parser
 
@@ -34,6 +36,10 @@ ALL_FILES = $(ML_FILES) \
 PACKS = ocamlgraph
 
 SOURCES = $(MLI_FILES) $(ML_FILES)
+
+DOT_FILE := $(shell find $(RAPPORT_EXP) -name '*.dot')
+
+PDF_FILE := $(DOT_FILE:$(RAPPORT_EXP)%.dot=$(RAPPORT_EXP)%.pdf)
 
 .PHONY: all
 all: nc
@@ -83,6 +89,12 @@ re: fclean $(RESULT)
 
 .PHONY: tar
 tar: $(TAR)
+
+$(RAPPORT_EXP)%.pdf: $(RAPPORT_EXP)%.dot
+	@dot $< -Tpdf -o $@
+
+dotToSvg: $(PDF_FILE)
+	@printf "Dot to svg dans %s\n" $(RAPPORT_EXP)
 
 $(TAR): fclean
 	mkdir -p $(TAR_DIR)

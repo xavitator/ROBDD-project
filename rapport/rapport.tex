@@ -1,4 +1,6 @@
 \documentclass[a4paper, oneside]{report}
+
+\usepackage[top=3cm, bottom = 3cm, left = 3cm, right =3cm]{geometry}
 \usepackage{amsfonts,amsmath,amssymb}
 \usepackage[utf8]{inputenc}
 \usepackage[francais]{babel}
@@ -15,6 +17,10 @@
 
 \newcommand{\adb}{arbre~de~décision binaire~}
 \newcommand{\adbs}{arbres~de~décision binaires~}
+\newcommand{\adbo}{\adb ordonné~}
+\newcommand{\adbos}{\adbs ordonnés~}
+\newcommand{\adboc}{\adbo canonique~}
+\newcommand{\adbocs}{\adbos canoniques~}
 \newcommand{\expp}{expression~propositionnelle~}
 \newcommand{\expps}{expressions~propositionnelles~}
 \newcommand{\ssi}{si~et~seulement~si~}
@@ -22,7 +28,7 @@
 \begin{document}
 
 
-\title{Diagramme de décision binaire - ROBDD \\ Rapport pour le projet Mathématique et Informatique de L3 de 2018-2019  }
+\title{Arbre de décision binaire - \textit{ROBDD} en anglais \\ Rapport pour le projet Mathématique et Informatique de L3 de 2018-2019  }
 \date{\today}
 \author{Sébastien Palmer et Xavier Durand \\~\\ Encadré par Sedki Boughattas }
 \maketitle
@@ -61,6 +67,8 @@ On va présenter ici les cinq symboles logiques les plus utilisés en logique pr
 
 \end{itemize}
 
+\newpage
+
 Voici les tables de vérités de chacun des connecteurs logiques :
 \begin{figure}[h]
 \begin{center}
@@ -73,13 +81,6 @@ $1$ & $0$ \\
 \hline 
 \end{tabular}
 \hspace*{1em}
-\begin{tabular}{|c|c|c|c|c|c|}
-\hline 
-\multicolumn{2}{|c|}{} &  &  &  &  \\ 
-\hline 
-\multicolumn{2}{|c|}{} &  &  &  &  \\ 
-\hline 
-\end{tabular} 
 \begin{tabular}[t]{|c|cc|}
 \hline 
 $\wedge$ & $0$ & $1$ \\ 
@@ -134,10 +135,31 @@ $$x \wedge y \wedge z \hspace{2em} et \hspace{2em} x \vee y \vee z$$
 
 \section*{Qu'est ce qu'une ROBDD (présentation rapide)}
 
+\noindent Nous allons ensuite introduire la notion d'arbre de décision binaire, on le notera \textit{ADB}. Cela se présente de la sorte :
 
+\begin{figure}[htbp]
+  \centering
+  \includegraphics[trim = 0cm 1.5cm 0cm 1cm , scale=0.6]{exemple/impl_simple}
+  \caption{ADB d'un implication simple : $x_0 \Rightarrow x_1$}
+\end{figure}
+Cet arbre se lit de haut en bas : on commence par évaluer la première variable, soit à $vrai$ soit à $faux$. Ensuite on arrive dans un autre état où la première variable n'existera plus et sera remplacé par son évaluation.\\
+On réitère ensuite ce processus pour les variables qui suivent.\\
+La flèche en pointillée représente le chemin à emprunter si la variable correspondant au nœud a 0 pour valeur de vérité et la flèche pleine correspond à la valeur de vérité 1.\\
+Ici, on voit bien que si $x_0$ est faux, alors l'implication est vrai, quelque soit la valeur de vérité de $x_1$.\\
+Si $x_0$ est vrai, alors il faut regarder la valeur de vérité de $x_1$ : si $x_1$ est vrai, alors l'implication est vraie et si $x_1$ est faux alors l'implication est fausse.\\
 
-\section*{Problématique}
-\section*{plan}
+Ici, on a aussi introduit l'idée que cet arbre est ordonné, qu'on notera \textit{ADBO} (arbre de décision binaire ordonné).\\
+Il faut donner un ordre aux variables pour savoir dans quel ordre on va attribuer une valeur de vérité aux variables pour former l'arbre.\\
+On le présentera plus en détail plus tard, mais il s'avère que l'arbre dépend de l'ordre choisi : on peut obtenir un arbre plus petit avec un certain ordre et un autre beaucoup plus grand avec un autre ordre.\\
+
+Enfin, introduisons la notion d'unicité de cet arbre. La construction de l'arbre est unique en fonction de l'ordre choisi, c'est à dire qu'en ayant fixé un ordre, toutes les expressions équivalentes posséderont le même ADB. On le notera \textit{ADBOC} (arbre de décision binaire ordonné canonique).\\
+ 
+\section*{Organisation}
+On va ici vous présenter les résultats de notre recherche sur le sujet.\\
+Dans un premier temps, on va vous présenter les propriétés d'un ADBOC et la raison pour laquelle on peut générer pour toutes \expps un ADBOC.\\
+Ensuite, nous présenterons l'algorithme que nous avons implémenté en Ocaml pour pouvoir générer ces ADBOCs. Nous discuterons aussi de la complexité de cet algorithme.\\
+Enfin, nous présenterons les intérêts des ADBOCs ainsi que des réflexions qu'on peut avoir sur leurs utilisations.  
+
 
 
 %%%%% Chapitre 1 %%%%%%%

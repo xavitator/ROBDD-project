@@ -54,7 +54,7 @@ struct
     output_string file (all_rank ());
     if(Hashtbl.mem content 1 && Hashtbl.mem content 0) then output_string file "  {rank=same 0 1}\n";
     output_string file " }";
-    g := G.empty
+    g := G.empty; Hashtbl.clear table; Hashtbl.clear content
 
   let add_node el =
     if Hashtbl.mem content (fst el) = false then begin
