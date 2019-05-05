@@ -12,7 +12,24 @@
 \usepackage{mdwtab}
 \usepackage[colorlinks=true,linkcolor=black]{hyperref}
 \frenchbsetup{StandardLists=true}
+\usepackage{listings}
+\usepackage{xcolor}
+\definecolor{darkgreen}{rgb}{0, 0.6, 0}
+\lstset{language=caml, frameround = fttt}
 
+\lstset{upquote=true,
+        columns=flexible,
+        keepspaces=true,
+        breaklines,
+        breakindent=0pt,
+        basicstyle=\ttfamily,
+        breaklines=true,
+        keywordstyle=\color{red},
+        commentstyle=\color{darkgreen},
+        tabsize=2,
+        escapechar={¤},
+        escapebegin=\color{gray},
+        }
 
 
 \newcommand{\adb}{arbre~de~décision binaire~}
@@ -174,8 +191,43 @@ Enfin, nous présenterons les intérêts des ADBOCs ainsi que des réflexions qu
 %%%%% Chapitre 2 %%%%%%%
 \chapter{Construction d'une ROBDD}
 
+On a implémenté tout un algorithme (en Ocaml) prenant en argument une expression propositionnelle et permettant d'obtenir l'ADBOC de celle-ci.\\
+On va vous présenter les fonctions principales.
+
 \section{présentation de l'algorithme}
-\section{Présentation de l'algo}
+
+Il faut déjà comprendre que l'algorithme implémenté est dans un paradigme impératif et qu'on va utiliser une structure correspondante à une Hashmap : l'accès à un élément est linéaire amorti et l'ajout est en temps linéaire amorti, c'est à dire qu'on peut faire ces opérations en temps constant dans un moyenne des temps mais en temps linéaire dans le pire des cas.\\
+Notons avant de comprendre l'algorithme en détail que nous avons une structure, noté $S$, qui nous permet d'associer un nœud de l'arbre à ses deux nœuds enfants : on notera \textit{low} pour le nœud suivant la valuation à \textit{faux} et \textit{high} le nœud correspondant à la valuation \textit{vrai} de la variable du nœud parent.\\
+Enfin, on indicera les variables par leur rang dans l'ordre : $x_n$ est la $n$-ième variable, $n\in \mathbb{N}$ et $n\geq 0$.\\
+
+L'algorithme est basé sur un principe récursif, on refait la même étape jusqu'à atteindre la condition de fin :
+\begin{enumerate}
+\item \label{order_eval} On détermine l'ordre d'évaluation des variables en fonction de l'ordre donné, pour obtenir un arbre ordonné.
+\item \label{start_eval} On évalue l'\expp donné en argument pour voir si la valuation n'est pas déjà déterminable. Par exemple, si on a $0 \wedge x$ avec $x$ une variable propositionnelle, alors on sait déjà que quelque soit la valuation de $x$, l'expression est fausse.
+\item Si la valuation est déterminé, on renvoie la nœud de l'arbre correspondant à la valeur de vérité correspondante (\textit{vrai} ou \textit{faux}).
+\item Sinon, on crée le nœud \textit{low} et le nœud \textit{high} : 
+ \begin{itemize}
+\item \textit{low} correspond au nœud créé quand on repasse par l'étape \ref{start_eval} où on a remplacé la variable évalué $0$ et où on évalue par la variable suivante dans l'ordre de l'étape \ref{order_eval}.
+\item \textit{high} correspond au nœud créé quand on repasse par l'étape \ref{start_eval} où on a remplacé la variable évalué $1$ et où on évalue par la variable suivante dans l'ordre de l'étape \ref{order_eval}.
+\end{itemize}
+\item Ensuite, on regarde si le nœud avec comme suivant \textit{low} et \textit{high} n'a pas déjà été créé, auquel cas on le crée, sinon on récupère le nœud déjà créé. Cela permet d'être sur qu'on obtient bien un arbre canonique.
+\item Enfin, on renvoie le nœud créé. A la fin de l'algorithme, le dernier nœud renvoyé correspondra à la racine de l'arbre.
+\end{enumerate}
+
+\section{Création d'un nœud}
+
+On vous présente en simplifier le code de la fonction qui s'occupe de créer un nouveau nœud en cas de besoin. Ensuite nous commenterons les différentes lignes.
+\begin{lstlisting}
+let mk (i : indice de la variable) (low : noeud) (high : noeud) : node =
+    if low = high then low      (* #1 *)
+    else
+    if member i low high then   (* #2 *)
+      lookup i low high         (* #3 *)
+    else
+      create_node i low high    (* #4 *)
+\end{lstlisting}
+
+
 \section{exemple d'exécution de l'algo}
 \section{Etude des complexités}
 
