@@ -207,8 +207,8 @@ L'algorithme est basé sur un principe récursif, on refait la même étape jusq
 \item Si la valuation est déterminé, on renvoie la nœud de l'arbre correspondant à la valeur de vérité correspondante (\textit{vrai} ou \textit{faux}).
 \item Sinon, on crée le nœud \textit{low} et le nœud \textit{high} : 
  \begin{itemize}
-\item \textit{low} correspond au nœud créé quand on repasse par l'étape \ref{start_eval} où on a remplacé la variable évalué $0$ et où on évalue par la variable suivante dans l'ordre de l'étape \ref{order_eval}.
-\item \textit{high} correspond au nœud créé quand on repasse par l'étape \ref{start_eval} où on a remplacé la variable évalué $1$ et où on évalue par la variable suivante dans l'ordre de l'étape \ref{order_eval}.
+\item \textit{low} correspond au nœud créé quand on repasse par l'étape \ref{start_eval} où on a remplacé la variable évaluée par $0$ et où on évalue par la variable suivante dans l'ordre de l'étape \ref{order_eval}.
+\item \textit{high} correspond au nœud créé quand on repasse par l'étape \ref{start_eval} où on a remplacé la variable évaluée par $1$ et où on évalue par la variable suivante dans l'ordre de l'étape \ref{order_eval}.
 \end{itemize}
 \item Ensuite, on regarde si le nœud avec comme suivant \textit{low} et \textit{high} n'a pas déjà été créé, auquel cas on le crée, sinon on récupère le nœud déjà créé. Cela permet d'être sur qu'on obtient bien un arbre canonique.
 \item Enfin, on renvoie le nœud créé. A la fin de l'algorithme, le dernier nœud renvoyé correspondra à la racine de l'arbre.
@@ -226,7 +226,118 @@ let mk (i : indice de la variable) (low : noeud) (high : noeud) : node =
     else
       create_node i low high    (* #4 *)
 \end{lstlisting}
+On regarde d'abord si on obtient le même résultat quelque soit la valuation de la i-ème variable ($\#1$). Si c'est le cas, on renvoie le nœud correspondant à une des deux valuations (on garde la canonicité).\\
+Si ce n'est pas le cas, on regarde si on n'a pas déjà créé un nœud ayant le même \textit{low} et le même \textit{high} ($\#2$), auquel cas on renvoie ce nœud ($\#3$).\\
+Enfin, si le nœud n'existe pas, alors on le crée ($\#4$).\\
+Dans le meilleur des cas, la création se fait en temps constant et dans le pire des cas, elle se fait en temps linéaire (à cause de la Hashmap).
 
+\section{Construction de l'arbre}
+
+On va ensuite pouvoir exposer l'algorithme correspondant à la construction même de l'arbre.
+\begin{lstlisting}
+let build (f : exp propositionnelle) : noeud = 
+    let tab = Array.init (!n) (function a -> None) in
+    let rec aux (f : exp propositionnelle) (i : indice de la variable) : node =
+      match getBool f tab with 									(* #1 *)
+      | (None, nf) -> begin										(* #2 *)
+          if i >= (!n) then failwith "exception de getBool"		(* #3 *)
+          else begin
+            let v0 = tab.(i) <- (Some false); aux nf (i+1) in	(* #4 *)
+            let v1 = tab.(i) <- (Some true); aux nf (i+1) in	(* #5 *)
+            tab.(i) <- None;	
+            mk i v0 v1											(* #6 *)
+          end
+        end
+      | (Some b, _) -> 											(* #7 *)
+        if b then 1
+        else 0
+    in
+    aux f 0
+\end{lstlisting}
+L'initialisation du tableau \textit{tab} correspond à l'évaluation partielle de chacune des variables.\\
+Ensuite, on fait une fonction récursive qui se déroule en $7$ étapes :
+\begin{enumerate}
+\item On fait l'évaluation partielle de l'\expp pour voir si on ne peut pas déterminer sa valeur sans avoir donné une valuation à chaque variable ($\#1$).\\
+\item Si ce n'est pas le cas ($\#2$), on vient effectuer le corps de l'algorithme en construisant de nouveaux nœuds. Ici, nous avons aussi effectué une optimisation de l'algorithme en faisant en sorte que, lors de l'évaluation partielle, on factorise l'\expp dans un même temps (correspond à la variable \textit{nf} dans $\#2$).
+\item Si on se retrouve dans la situation où on a déjà donné une valeur de vérité à toutes les variables et qu'on est dans une situation indéterminée, alors on a une erreur d'algorithme ($\#3$).
+\item Si on ne rencontre pas cette situation, on va récupérer le nœud correspondant à la valuation. Et donc on vient récupérer le nœud pour l'évaluation de la variable à $0$ ($\#4$), donc ce qui correspond au \textit{low}.
+\item Ensuite, on récupère pour la valuation à $1$ ($\#5$).\\
+\item Enfin, on récupère le nœud correspondant (création ou récupération d'un nœud déjà existant : dépend de la fonction \textit{mk}), et on renvoie ce nœud.
+\item Si, par contre, on se retrouve à avoir une valuation déjà déterminée, alors on se retrouve dans la situation $\#7$, et la on renvoie le nœud correspond à \textit{vrai} ou à \textit{faux}.
+\end{enumerate}
+Notre algorithme suit la logique où on donne une valuation $1$ ou $0$ à chaque variable, et donc on aurait une complexité de $2^n$ à chaque fois. Cependant, il fait cela de façon intelligente, et on ne se retrouve pas deux fois dans une même situation. On peut dire que c'est une sorte d'algorithme dynamique (à l'aide des hashmap).\\
+
+\section{Sat-solveur}
+On a ensuite défini des fonctions de parcours de cette arbre et qui nous permettent d'obtenir des informations intéressantes avec notre arbre déjà construit.
+
+\subsection{SatCount}
+La première fonction est une fonction en temps linéaire du nombre de nœud de notre arbre et qui permet de déterminer combien est ce qu'il y a de valeurs de vérité qui satisfassent une \expp.
+\begin{lstlisting}
+let satCount (u : noeud) : int =
+    let node_of_var = ... in									(* #1 *)
+    let rec aux (u : noeud) : (distance au noeud true, nombre de possibilites)  = 
+      if u = 0 then (0,0) 			
+      else if u = 1 then (0,1) 									(* #2 *)
+      else
+        let ind = node_of_var.(u) in
+        let som = 
+          let (i,res) = aux (low u) in two_power (ind - i - 1) * res (* #3 *)
+                        +
+          let (i, res) = aux (high u) in two_power (ind - i - 1) * res
+        in (ind, som)
+    in
+	let size = Array.length !var_tab in
+    if u = 0 then 0												(* #4 *)
+    else if u = 1 then two_power size							(* #5 *)
+    else let (i,res) = aux u in two_power (size - i) * res	(* #6 *)
+\end{lstlisting}
+
+Pour pouvoir compter le nombre de valeurs de vérité possible, on a besoin de savoir à quelle variable correspond chaque nœud (plus précisément, on renvoie l'indice de la variable et qui commence à $1$). C'est dans ce but là qu'on initialise le tableau \textit{node\_of\_var} ($\#1$).\\
+Ensuite, on va faire une fonction récursive locale à la fonction \textit{aux} : elle prend un nœud de l'arbre en argument et renvoie un couple contenant la distance du nœud à \textit{true} et le nombre de valuation possible depuis ce nœud là.\\
+Si on tombe sur le nœud \textit{vrai}, on renvoie le couple $(0,1)$, car la distance à lui-même est à $0$ et on a une solution possible, et $(0,0)$ pour \textit{faux} ($\#2$).\\
+Ensuite, si on n'est pas sur une constante, on calcule pour chaque valuation de la variable combien on a de solutions possibles ($\#3$) :
+
+\begin{itemize}
+\item On récupère le couple de \textit{low} et de \textit{high}.
+\item Si la variable suivante (\textit{low} ou \textit{high}) possède un indice dont la différence est supérieure à $1$, alors lors de la construction, on s'est retrouvé à faire une simplification du nœud parce qu'il amenait à la même valeur de vérité. Donc le nombre de solutions correspond à $2^{difference~des~distances~-~1}$.
+\end{itemize}
+Lorsqu'on sort de la boucle, il ne nous reste plus qu'à multiplier le nombre de solution de la racine par $2^{distance~avec~le~nombre~de~variables}$.\\
+On obtient ainsi le nombre de solutions possibles.
+
+\subsubsection{AnySat}
+
+Lorsque la construction de l'arbre a été effectué, on peut déterminer en tant constant si une \expp est une antilogie (s'il n'y a qu'un seul nœud et qu'il correspond à \textit{faux}). De plus, on peut trouver, en temps linéaire du nombre de variables, une valuation satisfaisant notre \expp.
+
+\begin{lstlisting}
+let rec anySat (u : noeud) : (variable * bool) list =
+    let rec aux u = 
+      if u = 0 then raise (No_SAT "Solution introuvable")
+      else if u = 1 then []
+      else if low u = 0 then (!var_tab.(var u), true) :: (aux (high u))
+      else (!var_tab.(var u), false) :: (aux (low u))
+    in
+    fill_var 0 (aux u)
+\end{lstlisting}
+Il suffit de parcourir notre nœud racine et d'arriver jusqu'au nœud \textit{vrai}. Pour cela, on a choisi de passer par \textit{low}, mais on aurait très bien pu passé par \textit{high}, car si \textit{low} et \textit{high} existe et sont différents de \textit{faux}, alors il y a un chemin permettant d'aller à \textit{vrai}.\\
+On est en temps linéaire du nombre de variable car à chaque itération, on descend d'un cran vers \textit{vrai}, et donc on donne une valuation à chaque variable.\\
+La dernière opération, appelé \textit{fill\_var}, permet de remplir la solution en attribuant une valeur de vérité à toutes les variables dont un nœud correspondant n'a pas été visité. Cela permet d'obtenir une solution attribuant une valeur de vérité à chaque variable.
+
+\subsubsection{AllSat}
+
+De la même façon, on peut aussi obtenir l'ensemble des solutions possibles en temps linéaire selon le nombre de nœud de l'arbre :
+\begin{lstlisting}
+let allSat (u : node) : (variable * bool) list list =
+    let rec aux (u : noeud) l r =
+      if u = 0 then r
+      else if u = 1 then l::r
+      else aux (high u) ((!var_tab.(var u), true)::l) (aux (low u) ((!var_tab.(var u), false)::l) r)
+    in 
+    List.rev (List.rev_map (fun a -> fill_var 0 a) (aux u [] []))
+\end{lstlisting}
+Ici, à chaque nœud, on a comme argument l'ensemble des solutions possibles pour les nœuds parents. Ensuite, on teste si on arrive à \textit{vrai} en évaluant la variable, et si c'est possible, on ajoute la valuation à l'ensemble des valuations possibles.\\
+On se retrouve ainsi à obtenir l'ensemble des solutions possibles en temps linéaire selon le nombre de nœud.\\
+
+On vous a beaucoup parlé de l'algorithme, mais maintenant passons à la pratique.
 
 \section{exemple d'exécution de l'algo}
 \section{Etude des complexités}
