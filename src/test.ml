@@ -29,9 +29,20 @@ let main (e : Test_exp.t exp) (str : string): unit = T.re_init (); T.main_expres
 
 let worse n = main (Worse.worse n) ("worse_"^string_of_int n)
 
-let _ = main impl_simple "impl_simple"
+(* let _ = main impl_simple "impl_simple" *)
 (* let _ = main tot "tot"
    let _ = main ant "ant"
    let _ = main impl "impl"
    let _ = main big "big" *)
-let _ = worse 4
+(* let _ = worse 15 *)
+
+let ordre () =
+  let permut = Worse.all_permut [|1;2;3;4|] in
+  List.iteri 
+    (fun i tab -> 
+       let all_op : int exp = Im((Eq((Et(Var tab.(0), Var tab.(1))),(Ou(Var tab.(1), Var tab.(2))))), (Et(No (Var tab.(3)), Var tab.(0)))) in
+       (* ((A ^ B) <-> (B v C)) -> (-D ^ A) *)
+       main all_op ("all_op_o"^ (string_of_int (i+1)))
+    ) permut
+
+let _ = ordre()
