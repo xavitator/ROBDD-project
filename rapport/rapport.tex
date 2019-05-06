@@ -14,6 +14,9 @@
 \frenchbsetup{StandardLists=true}
 \usepackage{listings}
 \usepackage{xcolor}
+\usepackage{graphicx}
+\usepackage{tikz}
+\usetikzlibrary{arrows,automata}
 \definecolor{darkgreen}{rgb}{0, 0.6, 0}
 \lstset{language=caml, frameround = fttt}
 
@@ -339,7 +342,309 @@ On se retrouve ainsi à obtenir l'ensemble des solutions possibles en temps lin�
 
 On vous a beaucoup parlé de l'algorithme, mais maintenant passons à la pratique.
 
-\section{exemple d'exécution de l'algo}
+\section{exemple d'exécution de l'algorithme}
+
+Prenons l'\expp suivante :
+$$A = ((x_1 \wedge x_3) \Leftrightarrow (x_3 \vee x_4)) \Rightarrow ((\neg x_2) \wedge x_1)$$
+
+On va faire les différentes étapes de l'algorithme :
+\newcommand{\largeur}{0.5\linewidth}
+
+\begin{figure}[h]
+   \begin{minipage}[c]{\largeur}
+      \begin{tikzpicture}[shorten >=1pt,node distance=1cm]
+
+	\node 			(X) at (-3,4)		{Étape 1};
+  \node[state]		   (A) at (-1,4)         {$A$};
+  \node[state]         (C) at (-2,2)		 {$C$};
+
+
+  \path[->,>=stealth', dashed] 
+		(A) edge              node {} (C);
+
+	
+\end{tikzpicture}
+   \end{minipage} \hfill
+   \begin{minipage}[c]{\largeur}
+      \begin{tikzpicture}[shorten >=1pt,node distance=1cm]
+\node 			(X) at (-3,4)		{Étape 2};
+  \node[state]		   (A) at (-1,4)         {$A$};
+  \node[state]         (C) at (-2,2)		 {$C$};
+  \node[state]         (E) at (1,1)			 {$E$};
+
+
+  \path[->,>=stealth', dashed] 
+		(A) edge              node {} (C)
+        (C) edge              node {} (E);
+
+\end{tikzpicture}
+   \end{minipage} \hfill
+\begin{minipage}[c]{\largeur}
+      \begin{tikzpicture}[shorten >=1pt,node distance=1cm]
+\node 			(X) at (-3,4)		{Étape 3};
+  \node[state]		   (A) at (-1,4)         {$A$};
+  \node[state]         (C) at (-2,2)		 {$C$};
+  \node[state]         (E) at (1,1)			 {$E$};
+  \node[state, below]         (G) at (2,0)			 {$faux$};
+
+
+  \path[->,>=stealth', dashed] 
+		(A) edge              node {} (C)
+        (C) edge              node {} (E)
+        (E) edge              node {} (G);
+
+\end{tikzpicture}
+   \end{minipage} \hfill
+   \begin{minipage}[c]{\largeur}
+      \begin{tikzpicture}[shorten >=1pt,node distance=1cm]
+\node 			(X) at (-3,4)		{Étape 4};
+  \node[state]		   (A) at (-1,4)         {$A$};
+  \node[state]         (C) at (-2,2)		 {$C$};
+  \node[state]         (E) at (1,1)			 {$E$};
+  \node[state, below]         (F) at (0,0)			 {$vrai$};
+  \node[state, below]         (G) at (2,0)			 {$faux$};
+
+
+  \path[->,>=stealth', dashed] 
+		(A) edge              node {} (C)
+        (C) edge              node {} (E)
+        (E) edge              node {} (G);
+
+  \path[->,>=stealth'] 
+        (E) edge              node {} (F);
+\end{tikzpicture}
+   \end{minipage}\hfill
+\end{figure}
+\begin{figure}[h]
+\begin{minipage}[c]{\largeur}
+      \begin{tikzpicture}[shorten >=1pt,node distance=1cm]
+\node 			(X) at (-3,4)		{Étape 5};
+  \node[state]		   (A) at (-1,4)         {$A$};
+  \node[state]         (C) at (-2,2)		 {$C$};
+  \node[state]         (E) at (1,1)			 {$E$};
+  \node[state, below]         (F) at (0,0)			 {$vrai$};
+  \node[state, below]         (G) at (2,0)			 {$faux$};
+
+
+  \path[->,>=stealth', dashed] 
+		(A) edge              node {} (C)
+        (C) edge              node {} (E)
+        (E) edge              node {} (G);
+
+  \path[->,>=stealth'] 
+        (C) edge              node {} (F)
+        (E) edge              node {} (F);
+\end{tikzpicture}
+   \end{minipage} \hfill
+\begin{minipage}[c]{\largeur}
+      \begin{tikzpicture}[shorten >=1pt,node distance=1cm]
+\node 			(X) at (-3,4)		{Étape 6};
+  \node[state]		   (A) at (-1,4)         {$A$};
+  \node[state]         (B) at (0,3)			 {$B$};
+  \node[state]         (C) at (-2,2)		 {$C$};
+  \node[state]         (E) at (1,1)			 {$E$};
+  \node[state, below]         (F) at (0,0)			 {$vrai$};
+  \node[state, below]         (G) at (2,0)			 {$faux$};
+
+
+  \path[->,>=stealth', dashed] 
+		(A) edge              node {} (C)
+        (C) edge              node {} (E)
+        (E) edge              node {} (G);
+
+  \path[->,>=stealth'] 
+		(A) edge              node {} (B)
+        (C) edge              node {} (F)
+        (E) edge              node {} (F);
+\end{tikzpicture}
+   \end{minipage} \hfill
+\begin{minipage}[c]{\largeur}
+      \begin{tikzpicture}[shorten >=1pt,node distance=1cm]
+\node 			(X) at (-3,4)		{Étape 7};
+  \node[state]		   (A) at (-1,4)         {$A$};
+  \node[state]         (B) at (0,3)			 {$B$};
+  \node[state]         (C) at (-2,2)		 {$C$};
+  \node[state]         (E) at (1,1)			 {$E$};
+  \node[state, below]         (F) at (0,0)			 {$vrai$};
+  \node[state, below]         (G) at (2,0)			 {$faux$};
+
+
+  \path[->,>=stealth', dashed] 
+		(A) edge              node {} (C)
+        (B) edge              node {} (F)
+        (C) edge              node {} (E)
+        (E) edge              node {} (G);
+
+  \path[->,>=stealth'] 
+		(A) edge              node {} (B)
+        (C) edge              node {} (F)
+        (E) edge              node {} (F);
+\end{tikzpicture}
+   \end{minipage} \hfill
+\begin{minipage}[c]{\largeur}
+      \begin{tikzpicture}[shorten >=1pt,node distance=1cm]
+\node 			(X) at (-3,4)		{Étape 8};
+  \node[state]		   (A) at (-1,4)         {$A$};
+  \node[state]         (B) at (0,3)			 {$B$};
+  \node[state]         (C) at (-2,2)		 {$C$};
+  \node[state]         (D) at (2,2)			 {$D$};
+  \node[state]         (E) at (1,1)			 {$E$};
+  \node[state, below]         (F) at (0,0)			 {$vrai$};
+  \node[state, below]         (G) at (2,0)			 {$faux$};
+
+
+  \path[->,>=stealth', dashed] 
+		(A) edge              node {} (C)
+        (B) edge              node {} (F)
+        (C) edge              node {} (E)
+        (E) edge              node {} (G);
+
+  \path[->,>=stealth'] 
+		(A) edge              node {} (B)
+        (B) edge              node {} (D)
+        (C) edge              node {} (F)
+        (E) edge              node {} (F);
+\end{tikzpicture}
+   \end{minipage} \hfill
+\end{figure}
+\begin{figure}[h]
+\begin{minipage}[c]{\largeur}
+      \begin{tikzpicture}[shorten >=1pt,node distance=1cm]
+\node 			(X) at (-3,4)		{Étape 9};
+  \node[state]		   (A) at (-1,4)         {$A$};
+  \node[state]         (B) at (0,3)			 {$B$};
+  \node[state]         (C) at (-2,2)		 {$C$};
+  \node[state]         (D) at (2,2)			 {$D$};
+  \node[state]         (E) at (1,1)			 {$E$};
+  \node[state, below]         (F) at (0,0)			 {$vrai$};
+  \node[state, below]         (G) at (2,0)			 {$faux$};
+
+
+  \path[->,>=stealth', dashed] 
+		(A) edge              node {} (C)
+        (B) edge              node {} (F)
+        (C) edge              node {} (E)
+        (D) edge              node {} (E)
+        (E) edge              node {} (G);
+
+  \path[->,>=stealth'] 
+		(A) edge              node {} (B)
+        (B) edge              node {} (D)
+        (C) edge              node {} (F)
+        (E) edge              node {} (F);
+\end{tikzpicture}
+   \end{minipage} \hfill
+\begin{minipage}[c]{\largeur}
+      \begin{tikzpicture}[shorten >=1pt,node distance=1cm]
+\node 			(X) at (-3,4)		{Étape 10};
+  \node[state]		   (A) at (-1,4)         {$A$};
+  \node[state]         (B) at (0,3)			 {$B$};
+  \node[state]         (C) at (-2,2)		 {$C$};
+  \node[state]         (D) at (2,2)			 {$D$};
+  \node[state]         (E) at (1,1)			 {$E$};
+  \node[state, below]         (F) at (0,0)			 {$vrai$};
+  \node[state, below]         (G) at (2,0)			 {$faux$};
+
+
+  \path[->,>=stealth', dashed] 
+		(A) edge              node {} (C)
+        (B) edge              node {} (F)
+        (C) edge              node {} (E)
+        (D) edge              node {} (E)
+        (E) edge              node {} (G);
+
+  \path[->,>=stealth'] 
+		(A) edge              node {} (B)
+        (B) edge              node {} (D)
+        (C) edge              node {} (F)
+        (D) edge              node {} (G)
+        (E) edge              node {} (F);
+\end{tikzpicture}
+   \end{minipage}
+\end{figure}
+
+\begin{figure}[!h]
+\begin{center}
+\begin{tikzpicture}[shorten >=1pt,node distance=1cm]
+\node 			(X) at (-3,4)		{Étape 11};
+  \node[state]		   (A) at (-1,4)         {$x_1$};
+  \node[state]         (B) at (0,3)			 {$x_2$};
+  \node[state]         (C) at (-2,2)		 {$x_3$};
+  \node[state]         (D) at (2,2)			 {$x_3$};
+  \node[state]         (E) at (1,1)			 {$x_4$};
+  \node[state, below]         (F) at (0,0)			 {$vrai$};
+  \node[state, below]         (G) at (2,0)			 {$faux$};
+
+
+  \path[->,>=stealth', dashed] 
+		(A) edge              node {} (C)
+        (B) edge              node {} (F)
+        (C) edge              node {} (E)
+        (D) edge              node {} (E)
+        (E) edge              node {} (G);
+
+  \path[->,>=stealth'] 
+		(A) edge              node {} (B)
+        (B) edge              node {} (D)
+        (C) edge              node {} (F)
+        (D) edge              node {} (G)
+        (E) edge              node {} (F);
+\end{tikzpicture}
+%\begin{minipage}[c]{\linewidth}
+%      \begin{tikzpicture}[shorten >=1pt,node distance=1cm]
+%
+%  \node[above]		(A) at (0 ,6)		{$((x_1 \wedge x_3) \Leftrightarrow (x_3 \vee x_4)) \Rightarrow ((\neg x_2) \wedge x_1)$};
+%  \node[above]		(B) at (-4,4)		{$((0 \wedge x_3) \Leftrightarrow (x_3 \vee x_4)) \Rightarrow ((\neg x_2) \wedge 0)$};
+%  \node[above]		(C) at (4 ,4)		{$((1 \wedge x_3) \Leftrightarrow (x_3 \vee x_4)) \Rightarrow ((\neg x_2) \wedge 1)$};
+%  \node[above]		(D) at (-6,2)		{$((0 \wedge x_3) \Leftrightarrow (x_3 \vee x_4)) \Rightarrow (1 \wedge 0)$};
+%  \node[above]		(E) at (-2,2)		{$((0 \wedge x_3) \Leftrightarrow (x_3 \vee x_4)) \Rightarrow (0 \wedge 0)$};
+%  \node[above]		(F) at (2 ,2)		{$((1 \wedge x_3) \Leftrightarrow (x_3 \vee x_4)) \Rightarrow (1 \wedge 1)$};
+%  \node[above]		(G) at (6 ,2)		{$((1 \wedge x_3) \Leftrightarrow (x_3 \vee x_4)) \Rightarrow (0 \wedge 1)$};
+%  \node[above]		(H) at (-7,0)		{$((0 \wedge 0) \Leftrightarrow (0 \vee x_4)) \Rightarrow (1 \wedge 0)$};
+%  \node[above]		(I) at (-5,0)		{$((0 \wedge 1) \Leftrightarrow (1 \vee x_4)) \Rightarrow (1 \wedge 0)$};
+%  \node[above]		(J) at (-3,0)		{$((0 \wedge 0) \Leftrightarrow (0 \vee x_4)) \Rightarrow (0 \wedge 0)$};
+%  \node[above]		(K) at (-1,0)		{$((0 \wedge 1) \Leftrightarrow (1 \vee x_4)) \Rightarrow (0 \wedge 0)$};
+%  \node[above]		(L) at (1 ,0)		{$((1 \wedge 0) \Leftrightarrow (0 \vee x_4)) \Rightarrow (1 \wedge 1)$};
+%  \node[above]		(M) at (3 ,0)		{$((1 \wedge 1) \Leftrightarrow (1 \vee x_4)) \Rightarrow (1 \wedge 1)$};
+%  \node[above]		(N) at (5 ,0)		{$((1 \wedge 0) \Leftrightarrow (0 \vee x_4)) \Rightarrow (0 \wedge 1)$};
+%  \node[above]		(O) at (7 ,0)		{$((1 \wedge 1) \Leftrightarrow (1 \vee x_4)) \Rightarrow (0 \wedge 1)$};
+%
+%  \path[->,>=stealth'] 
+%		(A) edge              node {} (C)
+%		(B) edge              node {} (E)
+%        (C) edge              node {} (G)
+%		(D) edge              node {} (I)
+%		(E) edge              node {} (K)
+%        (F) edge              node {} (M)
+%        (G) edge              node {} (O);
+%
+%\path[->,>=stealth', dashed] 
+%		(A) edge              node {} (B)
+%        (B) edge              node {} (D)
+%        (C) edge              node {} (F)
+%		(D) edge              node {} (H)
+%        (E) edge              node {} (J)
+%        (F) edge              node {} (L)
+%        (G) edge              node {} (N);
+%
+%
+%\end{tikzpicture}
+%   \end{minipage}
+\end{center}
+\end{figure}
+
+Avec :\\
+\begin{equation}
+\begin{aligned}
+A & = ((x_1 \wedge x_3) \Leftrightarrow (x_3 \vee x_4)) \Rightarrow ((\neg x_2) \wedge x_1)\\
+B & = (x_3 \Leftrightarrow (x_3 \vee x_4)) \Rightarrow (\neg x_2)\\
+C & = x_3 \vee x_4                                              \\
+D & = \neg (x_3 \Leftrightarrow (x_3 \vee x_4))                  \\
+E & = x_4\\
+\end{aligned}
+\end{equation}
+
+
 \section{Etude des complexités}
 
 %%%%% Chapitre 3 %%%%%%%
