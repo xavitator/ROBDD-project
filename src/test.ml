@@ -37,9 +37,10 @@ let worse n = main (Worse.worse n) ("worse_"^string_of_int n)
 (* let _ = worse 15 *)
 
 let ordre () =
-  let permut = Worse.all_permut [|1;2;3;4|] in
+  let permut = Worse.all_permut [|1;3;4;2|] in
   List.iteri 
     (fun i tab -> 
+       print_endline (string_of_int tab.(0) ^ string_of_int tab.(1) ^ string_of_int tab.(2) ^ string_of_int tab.(3));
        let all_op : int exp = Im((Eq((Et(Var tab.(0), Var tab.(1))),(Ou(Var tab.(1), Var tab.(2))))), (Et(No (Var tab.(3)), Var tab.(0)))) in
        (* ((A ^ B) <-> (B v C)) -> (-D ^ A) *)
        main all_op ("all_op_o"^ (string_of_int (i+1)))

@@ -307,7 +307,7 @@ Ensuite, si on n'est pas sur une constante, on calcule pour chaque valuation de 
 Lorsqu'on sort de la boucle, il ne nous reste plus qu'à multiplier le nombre de solution de la racine par $2^{distance~avec~le~nombre~de~variables}$.\\
 On obtient ainsi le nombre de solutions possibles.
 
-\subsubsection{AnySat}
+\subsection{AnySat}
 
 Lorsque la construction de l'arbre a été effectué, on peut déterminer en tant constant si une \expp est une antilogie (s'il n'y a qu'un seul nœud et qu'il correspond à \textit{faux}). De plus, on peut trouver, en temps linéaire du nombre de variables, une valuation satisfaisant notre \expp.
 
@@ -325,7 +325,7 @@ Il suffit de parcourir notre nœud racine et d'arriver jusqu'au nœud \textit{vr
 On est en temps linéaire du nombre de variable car à chaque itération, on descend d'un cran vers \textit{vrai}, et donc on donne une valuation à chaque variable.\\
 La dernière opération, appelé \textit{fill\_var}, permet de remplir la solution en attribuant une valeur de vérité à toutes les variables dont un nœud correspondant n'a pas été visité. Cela permet d'obtenir une solution attribuant une valeur de vérité à chaque variable.
 
-\subsubsection{AllSat}
+\subsection{AllSat}
 
 De la même façon, on peut aussi obtenir l'ensemble des solutions possibles en temps linéaire selon le nombre de nœud de l'arbre :
 \begin{lstlisting}
@@ -342,12 +342,14 @@ On se retrouve ainsi à obtenir l'ensemble des solutions possibles en temps lin�
 
 On vous a beaucoup parlé de l'algorithme, mais maintenant passons à la pratique.
 
-\section{exemple d'exécution de l'algorithme}
+\section{Exemple d'exécution de l'algorithme}
 
 Prenons l'\expp suivante :
 $$A = ((x_1 \wedge x_3) \Leftrightarrow (x_3 \vee x_4)) \Rightarrow ((\neg x_2) \wedge x_1)$$
 
-On va faire les différentes étapes de l'algorithme :
+On va faire les différentes étapes de l'algorithme.\\
+Première chose, on va définir l'ordre suivante : $x_1 < x_2 < x_3 < x_4$.
+
 \newcommand{\largeur}{0.5\linewidth}
 
 \begin{figure}[h]
@@ -415,7 +417,16 @@ On va faire les différentes étapes de l'algorithme :
 \end{tikzpicture}
    \end{minipage}\hfill
 \end{figure}
-\begin{figure}[h]
+
+Première étape, on prend notre \expp, et on cherche \textit{low} et \textit{high} donc on donne une valeur de vérité à la variable $x_1$.\\
+Tout d'abord, on associe $0$ à $x_1$, et on arrive en $C = x_3 \vee x_4  $.\\
+Ensuite, $C$ n'est pas un état terminal, donc on doit déterminer son \textit{low} et \textit{high} pour la variable $x_3$ car ni la variable $x_1$, ni la variable $x_2$ n'existe.\\
+Donc à l'étape 2, on cherche \textit{low} (on associe $0$ à $x_3$) et on arrive dans le nœud $E = x_4$.\\
+On n'est toujours pas dans un état terminal, donc on cherche le \textit{low} et le \textit{high} de $E$.\\
+On commence d'abord par \textit{low}, donc on associe $0$ à $x_4$ et là on se retrouve dans l'état terminal \textit{faux} (étape 3).\\
+On peut ensuite chercher \textit{high}. A l'étape 4, on associe $1$ à $x_4$ et on arrive sur l'état terminal \textit{true}.
+\newpage
+\begin{figure}[!h]
 \begin{minipage}[c]{\largeur}
       \begin{tikzpicture}[shorten >=1pt,node distance=1cm]
 \node 			(X) at (-3,4)		{Étape 5};
@@ -507,7 +518,14 @@ On va faire les différentes étapes de l'algorithme :
 \end{tikzpicture}
    \end{minipage} \hfill
 \end{figure}
-\begin{figure}[h]
+
+Ensuite, on a terminé de déterminer \textit{low} et \textit{high} de $E$, on a donc déterminé le \textit{low} de $C$.\\
+On peut donc à l'étape 5 déterminer \textit{high}, et on arrive sur l'état terminal \textit{vrai}.\\
+Ensuite, on remonte à $A$ où on va ensuite pouvoir déterminer son \textit{high}. On trouve à l'étape 6 le nœud $B = (x_3 \Leftrightarrow (x_3 \vee x_4)) \Rightarrow (\neg x_2)$.\\
+À l'étape 7, on détermine que \textit{low} de $B$ est l'état terminal \textit{vrai}.\\
+À l'étape 8, on cherche \textit{high} et on arrive à l'état $D= \neg (x_3 \Leftrightarrow (x_3 \vee x_4))$.
+
+\begin{figure}[!h]
 \begin{minipage}[c]{\largeur}
       \begin{tikzpicture}[shorten >=1pt,node distance=1cm]
 \node 			(X) at (-3,4)		{Étape 9};
@@ -563,6 +581,11 @@ On va faire les différentes étapes de l'algorithme :
    \end{minipage}
 \end{figure}
 
+On détermine ensuite à l'étape 9 le \textit{low} de $D$, et on retrouve un nœud ayant le même \textit{low} et le même \textit{high} que $E$, donc le \textit{low} de $D$ est $E$.\\
+Ensuite, à l'étape 10, on détermine le \textit{high} de $D$ qui est \textit{faux}.\\
+Enfin, on a trouvé le \textit{low} et le \textit{high} du nœud racine (ici $A$), donc on a terminé l'algorithme.\\
+\newpage
+En remplaçant chaque nom de nœud par la variable qui a été évalué pour le \textit{low} et \textit{high}, on obtient l'\adboc pour l'\expp $A$ suivant :\\
 \begin{figure}[!h]
 \begin{center}
 \begin{tikzpicture}[shorten >=1pt,node distance=1cm]
@@ -590,62 +613,48 @@ On va faire les différentes étapes de l'algorithme :
         (D) edge              node {} (G)
         (E) edge              node {} (F);
 \end{tikzpicture}
-%\begin{minipage}[c]{\linewidth}
-%      \begin{tikzpicture}[shorten >=1pt,node distance=1cm]
-%
-%  \node[above]		(A) at (0 ,6)		{$((x_1 \wedge x_3) \Leftrightarrow (x_3 \vee x_4)) \Rightarrow ((\neg x_2) \wedge x_1)$};
-%  \node[above]		(B) at (-4,4)		{$((0 \wedge x_3) \Leftrightarrow (x_3 \vee x_4)) \Rightarrow ((\neg x_2) \wedge 0)$};
-%  \node[above]		(C) at (4 ,4)		{$((1 \wedge x_3) \Leftrightarrow (x_3 \vee x_4)) \Rightarrow ((\neg x_2) \wedge 1)$};
-%  \node[above]		(D) at (-6,2)		{$((0 \wedge x_3) \Leftrightarrow (x_3 \vee x_4)) \Rightarrow (1 \wedge 0)$};
-%  \node[above]		(E) at (-2,2)		{$((0 \wedge x_3) \Leftrightarrow (x_3 \vee x_4)) \Rightarrow (0 \wedge 0)$};
-%  \node[above]		(F) at (2 ,2)		{$((1 \wedge x_3) \Leftrightarrow (x_3 \vee x_4)) \Rightarrow (1 \wedge 1)$};
-%  \node[above]		(G) at (6 ,2)		{$((1 \wedge x_3) \Leftrightarrow (x_3 \vee x_4)) \Rightarrow (0 \wedge 1)$};
-%  \node[above]		(H) at (-7,0)		{$((0 \wedge 0) \Leftrightarrow (0 \vee x_4)) \Rightarrow (1 \wedge 0)$};
-%  \node[above]		(I) at (-5,0)		{$((0 \wedge 1) \Leftrightarrow (1 \vee x_4)) \Rightarrow (1 \wedge 0)$};
-%  \node[above]		(J) at (-3,0)		{$((0 \wedge 0) \Leftrightarrow (0 \vee x_4)) \Rightarrow (0 \wedge 0)$};
-%  \node[above]		(K) at (-1,0)		{$((0 \wedge 1) \Leftrightarrow (1 \vee x_4)) \Rightarrow (0 \wedge 0)$};
-%  \node[above]		(L) at (1 ,0)		{$((1 \wedge 0) \Leftrightarrow (0 \vee x_4)) \Rightarrow (1 \wedge 1)$};
-%  \node[above]		(M) at (3 ,0)		{$((1 \wedge 1) \Leftrightarrow (1 \vee x_4)) \Rightarrow (1 \wedge 1)$};
-%  \node[above]		(N) at (5 ,0)		{$((1 \wedge 0) \Leftrightarrow (0 \vee x_4)) \Rightarrow (0 \wedge 1)$};
-%  \node[above]		(O) at (7 ,0)		{$((1 \wedge 1) \Leftrightarrow (1 \vee x_4)) \Rightarrow (0 \wedge 1)$};
-%
-%  \path[->,>=stealth'] 
-%		(A) edge              node {} (C)
-%		(B) edge              node {} (E)
-%        (C) edge              node {} (G)
-%		(D) edge              node {} (I)
-%		(E) edge              node {} (K)
-%        (F) edge              node {} (M)
-%        (G) edge              node {} (O);
-%
-%\path[->,>=stealth', dashed] 
-%		(A) edge              node {} (B)
-%        (B) edge              node {} (D)
-%        (C) edge              node {} (F)
-%		(D) edge              node {} (H)
-%        (E) edge              node {} (J)
-%        (F) edge              node {} (L)
-%        (G) edge              node {} (N);
-%
-%
-%\end{tikzpicture}
-%   \end{minipage}
 \end{center}
 \end{figure}
 
-Avec :\\
-\begin{equation}
-\begin{aligned}
-A & = ((x_1 \wedge x_3) \Leftrightarrow (x_3 \vee x_4)) \Rightarrow ((\neg x_2) \wedge x_1)\\
-B & = (x_3 \Leftrightarrow (x_3 \vee x_4)) \Rightarrow (\neg x_2)\\
-C & = x_3 \vee x_4                                              \\
-D & = \neg (x_3 \Leftrightarrow (x_3 \vee x_4))                  \\
-E & = x_4\\
-\end{aligned}
-\end{equation}
-
 
 \section{Etude des complexités}
+
+Maintenant, intéressons nous aux complexités des différentes fonctions. On peut se demander à juste titre si cet algorithme ne pourrait pas être intéressant.\\
+Voici un tableau récapitulatif des complexités :\\
+\begin{center}
+\begin{tabular}{|c|c|c|}
+\hline 
+&&\\
+Fonction & Compléxité & Note \\ 
+&&\\
+&&\\
+\hline 
+&&\\
+MK(i, low, high) & $O(1)$ & En considérant que la hashmap est en temps constant \\ 
+&&\\
+\hline 
+&&\\
+BUILD(exp) & $O(2^n)$ & pire cas : calculer toutes les valeurs de vérité \\ 
+&&\\
+\hline 
+&&\\
+SATCOUNT(racine) & $O(|arbre|)$ & Linéaire selon le nombre de nœud de l'arbre \\ 
+&&\\
+\hline 
+&&\\
+ANYSAT(racine) & $O(n)$ & Linéaire selon le nombre de variables \\ 
+&&\\
+\hline 
+&&\\
+ALLSAT(racine) & $O(max(2^{|arbre|}, 2^n))$ & Nombre de solutions possibles \\ 
+&&\\
+\hline 
+\end{tabular} 
+\end{center}
+
+On remarque que la fonction ANYSAT est en tant constant du nombre de variable, mais il faut prendre en compte qu'on a construit au préalable l'\adboc correspondant.\\
+Le plus gros de la complexité de l'algorithme se fait donc au niveau de la fonction BUILD.\\
+On va voir dans la partie d'après nos réflexions là-dessus.
 
 %%%%% Chapitre 3 %%%%%%%
 \chapter{Intérêt et optimisation}
@@ -657,16 +666,18 @@ E & = x_4\\
 %%%%% Conclusion %%%%%%%
 \chapter*{Conclusion}
 \addcontentsline{toc}{chapter}{Conclusion}
-
-\section*{Nouvelle approche d'une expression propositionnelle}
-\section*{Optimisation que cela apporte en fonction de l'ordre}
-\section*{Représentation simple d'une expression prop}
-\section*{Théorie développée et approche de recherche pour les ordres}
-\section*{Ce que le projet nous a apporté}
-
+L'utilisation des \adbocs est une nouvelle approche des \expp qui est très intéressante. Ce projet a été une première approche à la recherche en mathématique et en informatique sur les \expps.\\
+De plus, on a pu voir la complexité de trouver une méthode de résolution \textit{SAT} même si cet algorithme n'est pas adapté pour être un \textit{SAT-solveur}.\\
+On a du faire un travail de recherche sur les différents ordres possibles pour une \expp pour voir s'il n'existait pas un ordre qui permettrait de construire un arbre en temps polynomiale.\\
+Si un tel ordre existait, on pourrait construire l'arbre en temps polynomiale et ensuite trouver une solution en temps linéaire : ce qui pourrait être très intéressant pour un Sat-solveur.\\
+On a vu que pour une même \expp, on peut avoir deux ordres différents nous donnant un nombre de nœud totalement différent.\\
+Ceci est une toute nouvelle approche possible qu'on a pu avoir.\\
+Cependant, l'utilisation d'un \adboc est surtout pour déterminer si deux \expps sont équivalentes : comme on construit un arbre canonique, on obtient, pour un même ordre, le même arbre si les deux\expps sont équivalentes.\\
+Ensuite, un \adboc permet aussi de représenter une \expp sous une forme plus compréhensible par un humain.\\
+Nous tenions à remercier Monsieur Sedki Boughattas qui nous a encadré pour ce projet. Nous avons été très intéressé par ce sujet.
 %%%%% Bibliographie %%%%%%%
 \chapter*{Bibliographie}
 \addcontentsline{toc}{chapter}{Bibliographie}
-Ajouter les différents articles sur lesquels on s'est basé.
+Article de Henrik Reif Andersen : \textit{An Introduction to Binary Decision Diagrams}
 
 \end{document}
