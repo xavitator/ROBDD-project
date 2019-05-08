@@ -185,11 +185,291 @@ Enfin, nous présenterons les intérêts des ADBOCs ainsi que des réflexions qu
 %%%%% Chapitre 1 %%%%%%%
 \chapter{Représentation sous ROBDD}
 
-\section{Système complet de $\varphi$}
-\section{démo de l'existence}
-\section{démo de l'unicité}
-\section{A quoi correspond le graphe, et rapport avec $\varphi$}
-\section{Représentation correcte -> pas de perte d'informations}
+\section{Opérateur If-then-else et INF}
+
+Soit $ x \rightarrow y_0, y_1 $ l'opérateur \textit{if-then-else} défini par \\
+$$ x \rightarrow y_0, y_1 = ( x \wedge y_0 ) \vee ( \neg x \wedge y_1 )$$
+Ainsi, $ t \rightarrow t_0, t_1 $ est \textit{vrai} si $t$ et $t_0$ sont \textit{vrais} ou si $t$ est \textit{faux} et $t_1$ est \textit{vrai}, et est faux sinon.\\
+Tout les operateurs peuvent assez facilement être traduit en utilisant uniquement l'opérateur \textit{if-then-else}, 1 et 0 (Pour \textit{vrai} et \textit{faux}) :\\
+
+\begin{itemize}
+\item $ \neg A = A \rightarrow 0, 1$
+\item $ (A \wedge B) = A \rightarrow B, 0$
+\item $ (A \vee B) = A \rightarrow 1, B$
+\item $ (A \Rightarrow B) = A \rightarrow B, 1$
+\item $ (A \Leftrightarrow B) = A \rightarrow B, (B \rightarrow 0, 1)$
+\end{itemize}
+
+où $A$ et $B$ sont des variables propositionnelles.\\
+
+On peut aussi représenter une variable propositionnelle $A$ par $A \rightarrow 1, 0$
+
+On introduit donc la \textit{Forme Normale If-then-else} (INF : \textit{If-then-else Normal Form}) comme étant une expression Booléen construite entièrement avec l'opérateur \textit{if-then-else}, 1 et 0 appliqué aux variables propositionnelles de la formule qu'elle traduit.\\
+
+En notant $t[0/x]$ l'expression obtenu en remplaçant la variable $x$ par $0$ dans $t$, on remarque assez facilement que :
+$$ t = x \rightarrow t[1/x], t[0/x] $$ pour chaque variable de t.\\
+On appelle se résultat l'\textit{Expansion de Shannon} de $t$ sur $x$.
+
+Grâce à ce résultat, on peut générer pour chaque expression booléen une INF en réitèrant l'expansion de Shannon sur chaque variable de l'expression.
+
+On a vu précédement que toute expression Booléen est équivalentes à une expression en INF, on a maintenant un moyen de la trouver.\\
+
+Exemple : Soit $t = ( x_1 \Leftrightarrow y_1 ) \wedge ( x_2 \Leftrightarrow y_2 )$.\\
+On peut donc appliquer l'expansion de Shannon :
+\begin{center}
+$t = x_1 \rightarrow t_1, t_0)$\\
+$t_0 = y_1 \rightarrow 0, t_{00})$\\
+$t_1 = y_1 \rightarrow t_{11}, 0)$\\
+$t_{00} = x_2 \rightarrow t_{001}, t_{000})$\\
+$t_{11} = x_2 \rightarrow t_{111}, t_{110})$\\
+$t_{000} = y_2 \rightarrow 0, 1)$\\
+$t_{001} = y_2 \rightarrow 1, 0)$\\
+$t_{110} = y_2 \rightarrow 0, 1)$\\
+$t_{111} = y_2 \rightarrow 1, 1)$\\
+\end{center}
+
+\section{Les ROBDD et leurs propriétés}
+
+On introduit les \textit{Diagrammes de Décision Binaire} (BDD) définis avec :
+\begin{itemize}
+\item Les noeuds représentent les expressions booléens t la variable $x$ dans l'expansion de Shannon.
+\item Les arêtes en pointillé représentent la valuation de $x$ en $0$ dans l'expansion de Shannon.
+\item Les arêtes pleines représentent la valuation de $x$ en $1$ dans l'expansion de Shannon.
+\end{itemize}
+
+Ainsi, chaque noeud non-terminaux représente une extansion de Shanon $ t = x \rightarrow t_1, t_0 $ et est représenté par un triplet (var, low, high) où :
+\begin{itemize}
+\item var est $x$
+\item low est le noeud représentant $t_0$
+\item high est le noeud représentant $t_1$
+\end{itemize}
+
+Les noeuds terminaux sont $0$ et $1$\\
+
+On représente donc une expression par le noeud racine.\\
+
+Avec l'exemple précédent, on obtient le BDD suivant :
+
+\newcommand{\largeur}{0.5\linewidth}
+
+\begin{figure}[h]
+   \begin{minipage}[c]{\largeur}
+      \begin{tikzpicture}[shorten >=1pt,node distance=1cm]
+\node[state]		   (X1) at (0,4)         {$x_1$};
+  \node[state]		   (Y11) at (-1,3)         {$y_1$};
+  \node[state]		   (Y12) at (1,3)         {$y_1$};
+  \node[state]		   (X21) at (-2,2)         {$x_2$};
+  \node[state]		   (X22) at (2,2)         {$x_2$};
+  \node[state]		   (Y21) at (-4,1)         {$y_2$};
+  \node[state]		   (Y22) at (-2,1)         {$y_2$};
+  \node[state]		   (Y23) at (2,1)         {$y_2$};
+  \node[state]		   (Y24) at (4,1)         {$y_2$};
+  \node[state, accepting, below]		   (T1) at (-4.5,0)         {$1$};
+  \node[state, accepting, below]		   (F1) at (-3.5,0)         {$0$};
+  \node[state, accepting, below]		   (F2) at (-2.5,0)         {$0$};
+  \node[state, accepting, below]		   (T2) at (-1.5,0)         {$1$};
+  \node[state, accepting, below]		   (F3) at (-0.5,0)         {$0$};
+  \node[state, accepting, below]		   (F4) at (0.5,0)         {$0$};
+  \node[state, accepting, below]		   (T3) at (1.5,0)         {$1$};
+  \node[state, accepting, below]		   (F5) at (2.5,0)         {$0$};
+  \node[state, accepting, below]		   (F6) at (3.5,0)         {$0$};
+  \node[state, accepting, below]		   (T4) at (4.5,0)         {$1$};
+
+
+  \path[->,>=stealth', dashed] 
+		(X1) edge              node {} (Y11)
+        (Y11) edge              node {} (X21)
+        (Y12) edge              node {} (F4)
+        (X21) edge              node {} (Y21)
+        (X22) edge              node {} (Y23)
+        (Y21) edge              node {} (T1)
+        (Y22) edge              node {} (F2)
+        (Y23) edge              node {} (T3)
+        (Y24) edge              node {} (F6);
+
+  \path[->,>=stealth'] 
+		(X1) edge              node {} (Y12)
+        (Y11) edge              node {} (F3)
+        (Y12) edge              node {} (X22)
+        (X21) edge              node {} (Y22)
+        (X22) edge              node {} (Y24)
+        (Y21) edge              node {} (F1)
+        (Y22) edge              node {} (T2)
+        (Y23) edge              node {} (F5)
+        (Y24) edge              node {} (T4);
+    \end{tikzpicture}
+   \end{minipage}\hfill
+\end{figure}
+
+Si les variables apparaîssent dans un même ordre tout au long de la construction du BDD, on dit que le diagramme est \textit{ordonné} (OBDD).\\
+
+On remarque certains noeuds sont dupliqué.\\
+Ainsi, dans l'exemple lors de la construction, on réduit par :
+
+\begin{center}
+$t_{000} = t_{110}$\\
+$t_{001} = t_{111}$\\
+$t_{00} = t_{11}$\\
+\end{center}
+
+Et on obtient :
+
+\begin{center}
+$t = x_1 \rightarrow t_1, t_0)$\\
+$t_0 = y_1 \rightarrow 0, t_{00})$\\
+$t_1 = y_1 \rightarrow t_{00}, 0)$\\
+$t_{00} = x_2 \rightarrow t_{001}, t_{000})$\\
+$t_{000} = y_2 \rightarrow 0, 1)$\\
+$t_{001} = y_2 \rightarrow 1, 0)$\\
+\end{center}
+
+Le diagramme devient donc :\\
+
+\begin{figure}[h]
+   \begin{minipage}[c]{\largeur}
+      \begin{tikzpicture}[shorten >=1pt,node distance=1cm]
+\node[state]		   (X1) at (0,4)         {$x_1$};
+  \node[state]		   (Y11) at (-1,3)         {$y_1$};
+  \node[state]		   (Y12) at (1,3)         {$y_1$};
+  \node[state]		   (X2) at (0,2)         {$x_2$};
+  \node[state]		   (Y21) at (-1,1)         {$y_2$};
+  \node[state]		   (Y22) at (1,1)         {$y_2$};
+  \node[state, accepting, below]		   (T) at (0.5,0)         {$1$};
+  \node[state, accepting, below]		   (F) at (-0.5,0)         {$0$};
+
+
+  \path[->,>=stealth', dashed] 
+		(X1) edge              node {} (Y11)
+        (Y11) edge              node {} (X2)
+        (Y12) edge              node {} (F)
+        (X2) edge              node {} (Y21)
+        (Y21) edge              node {} (T)
+        (Y22) edge              node {} (F);
+
+  \path[->,>=stealth'] 
+		(X1) edge              node {} (Y12)
+        (Y11) edge              node {} (F)
+        (Y12) edge              node {} (X2)
+        (X2) edge              node {} (Y22)
+        (Y21) edge              node {} (F)
+        (Y22) edge              node {} (T);
+    \end{tikzpicture}
+   \end{minipage}\hfill
+\end{figure}
+
+Si tout noeud redondant ont été supprimé et tout les noeuds identique ont été réduit, on dit que le diagramme est \textit{réduit} (ROBDD).\\
+
+Une ROBDD admet donc plusieurs propriété :
+
+\begin{itemize}
+\item Contient un ou deux noeud terminaux ($0$ et/ou $1$)
+\item Contient un ensemble de noeuds $u$ non-terminaux de degré 2 ($var(u)$ la variable $x$ du noeud, $low(u)$ le noeud de $t[0/x]$, $high(u)$ le noeud de $t[1/x]$)
+\item Les var(u) des noeuds respectent un ordre en fonction de leur place dans le diagramme ($x_1 < x_2 < ... < x_n$)
+\item Soit 2 noeuds $u$ et $v$, si $var(u) = var(v)$, $low(u) = low(v)$ et $high(u) = high(v)$ alors $u = v$
+\item Soit $u$ un noeud alors $low(u) \neq high(u)$
+\end{itemize}
+
+\begin{figure}[h]
+   \begin{minipage}[c]{\largeur}
+      \begin{tikzpicture}[shorten >=1pt,node distance=1cm]
+\node 			(N) at (0,3)		{Ordonnée : x < y, x < z};
+  \node[state]		   (X) at (0,1.5)         {$x$};
+  \node[state]         (Y) at (-1,0)		 {$y$};
+  \node[state]         (Z) at (1,0)		 {$z$};
+
+
+  \path[->,>=stealth', dashed] 
+		(X) edge              node {} (Y);
+		
+  \path[->,>=stealth'] 
+        (X) edge              node {} (Z);
+	
+\end{tikzpicture}
+   \end{minipage} \hfill
+   \begin{minipage}[c]{\largeur}
+      \begin{tikzpicture}[shorten >=1pt,node distance=1cm]
+\node 			(N) at (0,3)		{Unique};
+  \node[state]		   (X) at (-1,1.5)         {$x$};
+  \node[state]		   (X2) at (1,1.5)         {$x$};
+  \node[state]         (Y) at (-1,0)		 {$y$};
+  \node[state]         (Z) at (1,0)		 {$z$};
+
+  
+  \draw (0.5,1) -- (1.5,2) (0.5,2) -- (1.5,1);
+  \path[->,>=stealth', dashed] 
+		(X) edge              node {} (Y)
+		(X2) edge              node {} (Y);
+		
+  \path[->,>=stealth'] 
+        (X) edge              node {} (Z)
+        (X2) edge              node {} (Z);
+
+\end{tikzpicture}
+   \end{minipage} \hfill
+\begin{minipage}[c]{\largeur}
+      \begin{tikzpicture}[shorten >=1pt,node distance=1cm]
+\node 			(N) at (0,3)		{Non-redondant};
+  \node[state]		   (X) at (0,1.5)         {$x$};
+  \node[state]         (Y) at (0,0)		 {$y$};
+
+  
+  \draw (-0.5,1) -- (0.5,2) (-0.5,2) -- (0.5,1);
+  \path [->,>=stealth', dashed, out=210, in=150] 
+  (X) edge              node {} (Y);
+  
+  \path [->,>=stealth', out=-30, in=30] 
+  (X) edge              node {} (Y);
+
+\end{tikzpicture}
+   \end{minipage} \hfill
+\end{figure}
+
+
+\section{Une unique ROBDD pour chaque fonction binaire}
+
+On a vu précédement que l'on peut associer à toutes formules propositionnelles un ROBDD.\\
+
+Mais la valuation d'une formule formule n'est rien d'autre qu'une fonction binaire $f :\mathbb{B}^n \to \mathbb{B}$.\\
+
+\textbf{Lemme (Canonicité): } Pour toute fonction $f :\mathbb{B}^n \to \mathbb{B}$ il existe exactement une ROBDD $u$ avec comme ordre $x_1 < x_2 < ... < x_n$ notée $f^u = f(x_1,x_2,...,x_n)$
+
+Pour simplifier la démonstration, on pose :\\
+\begin{center}
+$f_b(x_2,...,x_n) = f(b,x_2,...,x_n)$ où $b \in \mathbb{B}$\\
+\end{center}
+
+\textbf{Démonstration } Par induction sur n :\\
+
+Si $n = 0$\\
+Alors il n'existe que 2 fonctions binaires sans argument : $f = 0$ et $f = 1$.\\
+Et il n'y a que 2 ROBDD qui n'utilisent pas de variable : $0 (= false)$ et $1 (= true)$\\
+Or $0$ est un ROBDD pour $f = 0$ mais pas pour $f = 1$ \\
+et $1$ est un ROBDD pour $f = 1$ mais pas pour $f = 0$ \\
+Donc il y a une unique ROBDD pour chaque $f :\mathbb{B}^0 \to \mathbb{B}$ \\
+
+Si $n \neq 0$\\
+Supposons que le Lemme est vrai pour tout $k <= n$, montrons que le Lemme est aussi vrai pour $n+1$.\\
+
+Soit $f :\mathbb{B}^{n+1} \to \mathbb{B}$.
+Alors $f(x_1,...,x_{n+1}) = x_1 \rightarrow f_1(x_2,...,x_{n+1}), f_0(x_2,...,x_{n+1})$\\
+Par induction : Il y existe des uniques $u_0$ et $u_1$ tels que $f^{u_0} = f_0$ et $f^{u_1} = f_1$.\\
+
+Il y a deux cas à considérer :\\
+
+Si $u_1 = u_0$ alors $f_0 = f^{u_0} = f^{u_1} = f_1$ donc $u_0 (= u_1)$ est aussi un ROBDD pour $f$. Qui est aussi unique dû à l'ordre.\\
+En effet, si $x_1$ se trouvait dans le ROBDD enracinée dans $u$ alors $var(u) = x_1$.\\
+Cependant $f = f^u$ alors $f_0 = f^u[0/x_1] = f^{low(u)}$ et $f_1 = f^u[1/x_1] = f^{high(u)}$ mais $f_0 = f_1$ alors par induction $low(u) = high(u)$ ce qui viol une des conditions des ROBDD.\\
+
+Si $u_1 \neq u_0$ alors par induction $f_{u_0} \neq f_{u_1}$.\\
+Posons u tel que $var(u) = x_1$, $low(u) = u_0$ et $high(u) = u_1$ ainsi $f^u = x_1 \rightarrow f^{u_1}, f^{u_0}$\\
+Par induction $f^{u_1} = f_1$ et $f^{u_0} = f_0$ Or $f(x_1,...,x_{n+1}) = x_1 \rightarrow f_1(x_2,...,x_{n+1}), f_0(x_2,...,x_{n+1})$ donc $f = f^u$ \\
+Supposons v un noeuds tel que $f = f^v$. Clairement $f^v$ dépend de $x_1$. Donc $f^v[0/x_1] \neq f^v[1/x_1]$ (Sinon cela violerai le ROBDD).\\
+Grâce à l'ordre $var(u) = x_1 = var(v)$.\\
+De plus $f^u = f$ donc $f^{low(v) = f_0 = f^{u_0}}$ et $f^{high(v) = f_1 = f^{u_1}}$ par induction $low(v) = u_0 = low(u)$ et $high(v) = u_1 = high(u)$.\\
+Donc par unicité des noeuds $u = v$
+
+%\section{A quoi correspond le graphe, et rapport avec $\varphi$}
+%\section{Représentation correcte -> pas de perte d'informations}
 
 %%%%% Chapitre 2 %%%%%%%
 \chapter{Construction d'une ROBDD}
@@ -350,7 +630,6 @@ $$A = ((x_1 \wedge x_3) \Leftrightarrow (x_3 \vee x_4)) \Rightarrow ((\neg x_2) 
 On va faire les différentes étapes de l'algorithme.\\
 Première chose, on va définir l'ordre suivante : $x_1 < x_2 < x_3 < x_4$.
 
-\newcommand{\largeur}{0.5\linewidth}
 
 \begin{figure}[h]
    \begin{minipage}[c]{\largeur}
