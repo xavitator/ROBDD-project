@@ -12,6 +12,7 @@ ML_FILES = \
 		src/implementation.ml \
 		src/worse.ml\
 		src/xor.ml\
+		src/combinat.ml\
 		src/test.ml 
 
 LY_DIR = src/lex_parser

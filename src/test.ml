@@ -31,6 +31,8 @@ let worse n = main (Worse.worse n) ("worse_"^string_of_int n)
 
 let xor n = main (Xor.create n) ("xor_"^string_of_int n)
 
+let combinatoire k n = main (Combinat.create k n) ("combinatoire_" ^ string_of_int k ^ "_" ^ string_of_int n)
+
 (* let _ = main impl_simple "impl_simple" *)
 (* let _ = main tot "tot"
    let _ = main ant "ant"
@@ -48,4 +50,4 @@ let ordre () =
        main all_op ("all_op_o"^ (string_of_int (i+1)))
     ) permut
 
-let _ = xor 10
+let _ = combinatoire 8 16
