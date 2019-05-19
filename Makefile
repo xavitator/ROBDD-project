@@ -11,6 +11,7 @@ ML_FILES = \
 		src/dot.ml \
 		src/implementation.ml \
 		src/worse.ml\
+		src/xor.ml\
 		src/test.ml 
 
 LY_DIR = src/lex_parser
