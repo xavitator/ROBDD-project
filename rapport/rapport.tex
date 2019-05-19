@@ -16,6 +16,7 @@
 \usepackage{xcolor}
 \usepackage{graphicx}
 \usepackage{tikz}
+\usepackage{circuitikz}
 \usetikzlibrary{arrows,automata}
 \definecolor{darkgreen}{rgb}{0, 0.6, 0}
 \lstset{language=caml, frameround = fttt}
@@ -952,10 +953,10 @@ De là il est possible de résoudre des problèmes logique comme le Problème de
 Exemple : Problème des 5 Reines\\
 
 \begin{figure}[h]
-%%ROBDD
+\includegraphics[width=200px]{exemple/queen_4.pdf}
 \end{figure}
 
-Avec un total de %nb solutions\\
+Avec un total de 2 solutions.\\
 
 La raison pour laquelle ce Sat-solveur n'est pas utilisé est que ,bien que la compléxité de l'algorithme ANYSAT soit linéaire, la fonction BUILD est de compléxité exponentielle.
 
@@ -973,25 +974,29 @@ Comme par exemple : un Circuit d'équivalence \\
 
 \begin{figure}[h]
    \begin{minipage}[c]{\largeur}
-      \begin{tikzpicture}[shorten >=1pt,node distance=1cm]
-  \node[state]		   (X) at (0,2)         {$x$};
-  \node[state]         (Y) at (0,0)		 {$y$};
-  \node[state]         (E) at (2,2)		 {$ \wedge $};
-  \node[state]		   (N) at (2,0)         {$ nor $};
-  \node[state]         (O) at (4,1)		 {$ \vee $};
-  \node[state]         (Z) at (6,1)		 {$z$};
+      \begin{circuitikz}
 
-		
-  \path[->,>=stealth', out=0, in=180] 
-        (X) edge              node {} (E)
-        (X) edge              node {} (N)
-        (Y) edge              node {} (E)
-        (Y) edge              node {} (N)
-        (E) edge              node {} (O)
-        (N) edge              node {} (O)
-        (O) edge              node {} (Z);
+    
+    \node[and port](AND) at (3,2) {};
+    \node[nor port](NOR) at (3,0) {};
+    \node[or port] (OR) at (5,1) {};
+    \node		    (X) at (0,2) {$x$};
+    \node            (Y) at (0,0) {$y$};
+    \node            (Z) at (6,1) {$z$};
+    \node            (XP) at (1.1,2) {\textbullet};
+    \node            (YP) at (0.7,0) {\textbullet};
+
+    \draw (X) -* (XP);
+    \draw (XP) |- (AND.in 1);
+    \draw (XP) |- (NOR.in 1);
+    \draw (Y) -* (YP);
+    \draw (YP) |- (AND.in 2);
+    \draw (YP) |- (NOR.in 2);
+    \draw (AND.out) |- (OR.in 1);
+    \draw (NOR.out) |- (OR.in 2);
+    \draw (OR.out) |- (Z);
 	
-\end{tikzpicture}
+\end{circuitikz}
    \end{minipage} \hfill
 \end{figure}
 
@@ -1045,7 +1050,44 @@ Pour la traduction des circuits en ROBDD sans passer par la formule revient à c
 
 Puis d'appliquer la fonction APPLY en fonction des portes logiques utiles.\\
 
+\newpage
+
+\begin{lstlisting}
+let apply (op : node->node->node) (u1 : node) (u2 : node) : node =
+    let g = Hashtbl.create (map_size*map_size) in
+    let rec aux (u1 : node) (u2 : node) : node =
+      if Hashtbl.mem g (u1, u2) then Hashtbl.find g (u1, u2)
+      else
+        let u =
+          if unite u1 && unite u2 then op u1 u2
+          else if var u1 = var u2 then              (* c1 *) 
+            mk (var u1)
+              (aux (low u1) (low u2)) 
+              (aux (high u1) (high u2))
+          else if var u1 < var u2 then              (* c2 *) 
+            mk (var u1)
+              (aux (low u1) u2) 
+              (aux (high u1) u2)
+          else                                      (* c3 *)
+            mk (var u2)
+              (aux u1 (low u2)) 
+              (aux u1 (high u2))
+        in 
+        Hashtbl.add g (u1, u2) u;
+        u
+    in
+    aux u1 u2
+\end{lstlisting}
+
+APPLY est un fonction qui nous permet de réunir deux ROBDD par un opérateur $op$ (dans notre cas les différentes portes). Son principe est récursif : On crée un nouveau noeud de $var$ prioritaire par rapport à l'ordre des $var$ des deux noeuds à réunir. On réunit les noeuds $low$ des deux noeuds en fonction de leur priorité dans l'ordre et fait de même pour les $high$. Ces deux nouveaux noeuds sont respectivement le $low$ et le $high$ du nouveau noeud. Si les noeuds à réunir sont des $1$ et/ou des $0$, on applique l'opérateur.\\
+
+APPLY ne viole pas les règles des ROBDD car elle utilise mk qui gère l'unicité des noeuds et la non-redondance et l'ordre est gèré directement dans l'algorithme avec les conditions $c1, c2, c3$.\\
+
+Utiliser APPLY nous permet alors de juste parcourir le circuit et construire le ROBDD en même temps.\\
+
+
 Ainsi, vérifier qu'un circuit logique donne les bons résultats devient très simple avec son ROBDD et montrer que deux circuits soient équivalents revient à remarquer que les deux ROBDD soient exactement les même (par unicité des ROBDD).
+
 
 \newpage
 
