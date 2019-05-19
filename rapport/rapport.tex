@@ -938,9 +938,120 @@ On va voir dans la partie d'après nos réflexions là-dessus.
 %%%%% Chapitre 3 %%%%%%%
 \chapter{Intérêt et optimisation}
 
-\section{Raison de la ROBDD}
-\section{Utilisation possible comme Sat-solveur mais mauvais}
+\section{Sat-solveur mais mauvais}
+
+La première utilisation des ROBDD est en tant que Sat-solveur. En effet, le fait de savoir si une formule admet une solution se fait en temps constant, dès que l'on a son ROBDD, car si la formule n'admet pas de solution alors elle est une antologie et par unicité des ROBDD, le ROBDD qui lui est associé est $0$.\\
+Et donc il suffit de comparer le premier noeud du ROBDD à 0 pour savoir si il existe une solution.\\
+
+Suite à ceci, il est possible de trouver l'ensemble de solution à partir du ROBDD en le parcourant et en retenant tout le chemin qui mènent au noeud $1$.\\
+
+On utilise ici les fonctions ANYSAT et ALLSAT (Et SATCOUNT si l'on n'a besoin uniquement du nombre de solution).\\
+
+De là il est possible de résoudre des problèmes logique comme le Problème des N Reines, le Sudoku ou encore des BenchMarks.\\
+
+Exemple : Problème des 5 Reines\\
+
+\begin{figure}[h]
+%%ROBDD
+\end{figure}
+
+Avec un total de %nb solutions\\
+
+La raison pour laquelle ce Sat-solveur n'est pas utilisé est que ,bien que la compléxité de l'algorithme ANYSAT soit linéaire, la fonction BUILD est de compléxité exponentielle.
+
+\newpage
+
+\section{Correction et Equivalence de la combinatoire de circuit}
+
+Lorsque l'on a le ROBDD d'une formule, il est assez facile de voir qu'elles sont les distributions de valeur de vérité qui la satisfaite.\\
+Donc une des principales utilisations des ROBDD et pour la correction ou équivalence de circuit (logique).\\
+
+En effet, il est assez évident de voir qu'un circuit logique peut être représenté par une formule.\\
+Les entrées sont les variables et les portes les opérations logiques (souvent unaire comme la porte 'N', ou binaire comme les portes 'OR', 'AND', 'NOR', 'XOR' ...).\\
+
+Comme par exemple : un Circuit d'équivalence \\
+
+\begin{figure}[h]
+   \begin{minipage}[c]{\largeur}
+      \begin{tikzpicture}[shorten >=1pt,node distance=1cm]
+  \node[state]		   (X) at (0,2)         {$x$};
+  \node[state]         (Y) at (0,0)		 {$y$};
+  \node[state]         (E) at (2,2)		 {$ \wedge $};
+  \node[state]		   (N) at (2,0)         {$ nor $};
+  \node[state]         (O) at (4,1)		 {$ \vee $};
+  \node[state]         (Z) at (6,1)		 {$z$};
+
+		
+  \path[->,>=stealth', out=0, in=180] 
+        (X) edge              node {} (E)
+        (X) edge              node {} (N)
+        (Y) edge              node {} (E)
+        (Y) edge              node {} (N)
+        (E) edge              node {} (O)
+        (N) edge              node {} (O)
+        (O) edge              node {} (Z);
+	
+\end{tikzpicture}
+   \end{minipage} \hfill
+\end{figure}
+
+De formule : $((x \wedge y) \vee (\neg(x \vee y)))$
+
+\begin{figure}[h]
+   \begin{minipage}[c]{\largeur}
+      \begin{tikzpicture}[shorten >=1pt,node distance=1cm]
+\node 			(N) at (0,3)		{ROBDD d'ordre : $x < y$};
+  \node[state]		   (X) at (0,2)         {$x$};
+  \node[state]         (Y0) at (-1,1)		 {$y$};
+  \node[state]         (Y1) at (1,1)		 {$y$};
+  \node[state]         (Z0) at (-1,-0.5)		 {$0$};
+  \node[state]         (Z1) at (1,-0.5)		 {$1$};
+
+
+  \path[->,>=stealth', dashed] 
+        (X) edge              node {} (Y0)
+        (Y0) edge              node {} (Z1)
+        (Y1) edge              node {} (Z0);
+		
+  \path[->,>=stealth'] 
+        (X) edge              node {} (Y1)
+		(Y0) edge              node {} (Z0)
+		(Y1) edge              node {} (Z1);
+	
+\end{tikzpicture}
+   \end{minipage} \hfill
+\end{figure}
+
+Pour la traduction des circuits en ROBDD sans passer par la formule revient à créer des ROBDDs pour chaque variables :
+
+\begin{figure}[h]
+   \begin{minipage}[c]{\largeur}
+      \begin{tikzpicture}[shorten >=1pt,node distance=1cm]
+\node 			(N) at (0,2.5)		{Variable : x};
+  \node[state]		   (X) at (0,1.5)         {$x$};
+  \node[state]         (Y) at (-1,0)		 {$0$};
+  \node[state]         (Z) at (1,0)		 {$1$};
+
+
+  \path[->,>=stealth', dashed] 
+		(X) edge              node {} (Y);
+		
+  \path[->,>=stealth'] 
+        (X) edge              node {} (Z);
+	
+\end{tikzpicture}
+   \end{minipage} \hfill
+\end{figure}
+
+Puis d'appliquer la fonction APPLY en fonction des portes logiques utiles.\\
+
+Ainsi, vérifier qu'un circuit logique donne les bons résultats devient très simple avec son ROBDD et montrer que deux circuits soient équivalents revient à remarquer que les deux ROBDD soient exactement les même (par unicité des ROBDD).
+
+\newpage
+
 \section{Théorie sur les ordres}
+
+% Rien Encore!
 
 %%%%% Conclusion %%%%%%%
 \chapter*{Conclusion}
