@@ -96,8 +96,8 @@ tar: $(TAR)
 $(RAPPORT_EXP)%.pdf: $(RAPPORT_EXP)%.dot
 	@dot $< -Tpdf -o $@
 
-dotToSvg: $(PDF_FILE)
-	@printf "Dot to svg dans %s\n" $(RAPPORT_EXP)
+dotToPdf: $(PDF_FILE)
+	@printf "Dot to pdf dans %s\n" $(RAPPORT_EXP)
 
 $(TAR): fclean
 	mkdir -p $(TAR_DIR)
