@@ -8,7 +8,7 @@
 %token PC
 %left ZERO
 %start main             /* the entry point */
-%type <(int*Implementation.exp)> main
+%type <(int* int Implementation.exp)> main
 %%
 main:
     P STRING INT INT expr PC ZERO                { ($3,$5) }

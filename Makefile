@@ -22,7 +22,9 @@ LEX_FILE = $(LY_DIR)/lexer.mll
 
 YACC_FILE = $(LY_DIR)/parser.mly
 
-BENCH_FILE = $(LY_DIR)/lexer.ml \
+BENCH_FILE = \
+		$(MLI_FILES) \
+		$(LY_DIR)/lexer.ml \
 		$(LY_DIR)/parser.ml \
 		src/bench.ml
 BENCH_MLI_FILE = $(LY_DIR)/parser.mli

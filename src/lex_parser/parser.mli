@@ -7,4 +7,4 @@ type token =
   | PC
 
 val main :
-  (Lexing.lexbuf  -> token) -> Lexing.lexbuf -> (int*Implementation.exp)
+  (Lexing.lexbuf  -> token) -> Lexing.lexbuf -> (int* int Implementation.exp)

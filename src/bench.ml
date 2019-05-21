@@ -7,7 +7,7 @@ let main (channel : string) : unit =
   try
     let lexbuf = Lexing.from_channel std in
     let (n,e) = Parser.main Lexer.token lexbuf in
-    Implementation.main e n (channel ^ "_file.dot")
+    Test.main e channel
   with _ -> print_endline "Fin !"
 ;;
 

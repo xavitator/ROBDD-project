@@ -52,4 +52,5 @@ let ordre () =
        main all_op ("all_op_o"^ (string_of_int (i+1)))
     ) permut
 
-let _ = queen 4
+(* let _ = queen 4 *)
+
