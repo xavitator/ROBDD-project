@@ -13,7 +13,6 @@ ML_FILES = \
 		src/worse.ml\
 		src/xor.ml\
 		src/combinat.ml\
-		src/queen.ml\
 		src/test.ml 
 
 LY_DIR = src/lex_parser
@@ -23,13 +22,12 @@ LEX_FILE = $(LY_DIR)/lexer.mll
 YACC_FILE = $(LY_DIR)/parser.mly
 
 BENCH_FILE = \
-		$(MLI_FILES) \
 		$(LY_DIR)/lexer.ml \
 		$(LY_DIR)/parser.ml \
 		src/bench.ml
 BENCH_MLI_FILE = $(LY_DIR)/parser.mli
 
-QUEEN_FILE = 
+QUEEN_FILE = src/queen.ml
 
 SUDOKU_FILE = src/sudoku.ml
 

@@ -96,4 +96,4 @@ let create_all n =
   in
   Et (one, impl)
 
-let main_queen n = create_all n
+let main_queen n = Test.main (create_all n) ("queen_"^ string_of_int n)
