@@ -191,7 +191,7 @@ Enfin, nous présenterons les intérêts des ADBOCs ainsi que des réflexions qu
 Soit $ x \rightarrow y_0, y_1 $ l'opérateur \textit{if-then-else} défini par \\
 $$ x \rightarrow y_0, y_1 = ( x \wedge y_0 ) \vee ( \neg x \wedge y_1 )$$
 Ainsi, $ t \rightarrow t_0, t_1 $ est \textit{vrai} si $t$ et $t_0$ sont \textit{vrais} ou si $t$ est \textit{faux} et $t_1$ est \textit{vrai}, et est faux sinon.\\
-Tout les operateurs peuvent assez facilement être traduit en utilisant uniquement l'opérateur \textit{if-then-else}, 1 et 0 (Pour \textit{vrai} et \textit{faux}) :\\
+Tout les operateurs peuvent assez facilement être traduits en utilisant uniquement l'opérateur \textit{if-then-else}, 1 et 0 (Pour \textit{vrai} et \textit{faux}) :\\
 
 \begin{itemize}
 \item $ \neg A = A \rightarrow 0, 1$
@@ -205,15 +205,15 @@ où $A$ et $B$ sont des variables propositionnelles.\\
 
 On peut aussi représenter une variable propositionnelle $A$ par $A \rightarrow 1, 0$
 
-On introduit donc la \textit{Forme Normale If-then-else} (INF : \textit{If-then-else Normal Form}) comme étant une expression Booléen construite entièrement avec l'opérateur \textit{if-then-else}, 1 et 0 appliqué aux variables propositionnelles de la formule qu'elle traduit.\\
+On introduit donc la \textit{Forme Normale If-then-else} (INF : \textit{If-then-else Normal Form}) comme étant une expression Booléenne construite entièrement avec l'opérateur \textit{if-then-else}, 1 et 0 appliqué aux variables propositionnelles de la formule qu'elle traduit.\\
 
 En notant $t[0/x]$ l'expression obtenu en remplaçant la variable $x$ par $0$ dans $t$, on remarque assez facilement que :
 $$ t = x \rightarrow t[1/x], t[0/x] $$ pour chaque variable de t.\\
 On appelle se résultat l'\textit{Expansion de Shannon} de $t$ sur $x$.
 
-Grâce à ce résultat, on peut générer pour chaque expression booléen une INF en réitèrant l'expansion de Shannon sur chaque variable de l'expression.
+Grâce à ce résultat, on peut générer, pour chaque expression booléenne, une INF en réitèrant l'expansion de Shannon sur chaque variable de l'expression.
 
-On a vu précédement que toute expression Booléen est équivalentes à une expression en INF, on a maintenant un moyen de la trouver.\\
+On a vu précédement que toute expression Booléenne est équivalente à une expression en INF, on a maintenant un moyen de la trouver.\\
 
 Exemple : Soit $t = ( x_1 \Leftrightarrow y_1 ) \wedge ( x_2 \Leftrightarrow y_2 )$.\\
 On peut donc appliquer l'expansion de Shannon :
@@ -233,16 +233,16 @@ $t_{111} = y_2 \rightarrow 1, 1)$\\
 
 On introduit les \textit{Diagrammes de Décision Binaire} (BDD) définis avec :
 \begin{itemize}
-\item Les noeuds représentent les expressions booléens t la variable $x$ dans l'expansion de Shannon.
-\item Les arêtes en pointillé représentent la valuation de $x$ en $0$ dans l'expansion de Shannon.
-\item Les arêtes pleines représentent la valuation de $x$ en $1$ dans l'expansion de Shannon.
+\item les noeuds représentant les expressions booléennes t la variable $x$ dans l'expansion de Shannon.
+\item Les arêtes en pointillés représentant la valuation de $x$ en $0$ dans l'expansion de Shannon.
+\item Les arêtes pleines représentant la valuation de $x$ en $1$ dans l'expansion de Shannon.
 \end{itemize}
 
-Ainsi, chaque noeud non-terminaux représente une extansion de Shanon $ t = x \rightarrow t_1, t_0 $ et est représenté par un triplet (var, low, high) où :
+Ainsi, chaque noeud non-terminal représente une expansion de Shanon $ t = x \rightarrow t_1, t_0 $ et est représenté par un triplet $(var, low, high)$ où :
 \begin{itemize}
-\item var est $x$
-\item low est le noeud représentant $t_0$
-\item high est le noeud représentant $t_1$
+\item $var$ est $x$
+\item $low$ est le noeud représentant $t_0$
+\item $high$ est le noeud représentant $t_1$
 \end{itemize}
 
 Les noeuds terminaux sont $0$ et $1$\\
@@ -254,7 +254,6 @@ Avec l'exemple précédent, on obtient le BDD suivant :
 \newcommand{\largeur}{0.5\linewidth}
 
 \begin{figure}[h]
-   \begin{minipage}[c]{\largeur}
       \begin{tikzpicture}[shorten >=1pt,node distance=1cm]
 \node[state]		   (X1) at (0,4)         {$x_1$};
   \node[state]		   (Y11) at (-1,3)         {$y_1$};
@@ -299,12 +298,11 @@ Avec l'exemple précédent, on obtient le BDD suivant :
         (Y23) edge              node {} (F5)
         (Y24) edge              node {} (T4);
     \end{tikzpicture}
-   \end{minipage}\hfill
 \end{figure}
 
 Si les variables apparaîssent dans un même ordre tout au long de la construction du BDD, on dit que le diagramme est \textit{ordonné} (OBDD).\\
 
-On remarque certains noeuds sont dupliqué.\\
+On remarque certains noeuds sont dupliqués.\\
 Ainsi, dans l'exemple lors de la construction, on réduit par :
 
 \begin{center}
@@ -327,7 +325,6 @@ $t_{001} = y_2 \rightarrow 1, 0)$\\
 Le diagramme devient donc :\\
 
 \begin{figure}[h]
-   \begin{minipage}[c]{\largeur}
       \begin{tikzpicture}[shorten >=1pt,node distance=1cm]
 \node[state]		   (X1) at (0,4)         {$x_1$};
   \node[state]		   (Y11) at (-1,3)         {$y_1$};
@@ -355,12 +352,11 @@ Le diagramme devient donc :\\
         (Y21) edge              node {} (F)
         (Y22) edge              node {} (T);
     \end{tikzpicture}
-   \end{minipage}\hfill
 \end{figure}
 
-Si tout noeud redondant ont été supprimé et tout les noeuds identique ont été réduit, on dit que le diagramme est \textit{réduit} (ROBDD).\\
+Si tout noeud redondant a été supprimé et tous noeuds identiques ont été réduits, on dit que le diagramme est \textit{réduit} (ROBDD).\\
 
-Une ROBDD admet donc plusieurs propriété :
+Un ROBDD admet donc plusieurs propriétés :
 
 \begin{itemize}
 \item Contient un ou deux noeud terminaux ($0$ et/ou $1$)
@@ -371,7 +367,6 @@ Une ROBDD admet donc plusieurs propriété :
 \end{itemize}
 
 \begin{figure}[h]
-   \begin{minipage}[c]{\largeur}
       \begin{tikzpicture}[shorten >=1pt,node distance=1cm]
 \node 			(N) at (0,3)		{Ordonnée : x < y, x < z};
   \node[state]		   (X) at (0,1.5)         {$x$};
@@ -386,8 +381,6 @@ Une ROBDD admet donc plusieurs propriété :
         (X) edge              node {} (Z);
 	
 \end{tikzpicture}
-   \end{minipage} \hfill
-   \begin{minipage}[c]{\largeur}
       \begin{tikzpicture}[shorten >=1pt,node distance=1cm]
 \node 			(N) at (0,3)		{Unique};
   \node[state]		   (X) at (-1,1.5)         {$x$};
@@ -406,8 +399,6 @@ Une ROBDD admet donc plusieurs propriété :
         (X2) edge              node {} (Z);
 
 \end{tikzpicture}
-   \end{minipage} \hfill
-\begin{minipage}[c]{\largeur}
       \begin{tikzpicture}[shorten >=1pt,node distance=1cm]
 \node 			(N) at (0,3)		{Non-redondant};
   \node[state]		   (X) at (0,1.5)         {$x$};
@@ -422,55 +413,52 @@ Une ROBDD admet donc plusieurs propriété :
   (X) edge              node {} (Y);
 
 \end{tikzpicture}
-   \end{minipage} \hfill
 \end{figure}
 
 
-\section{Une unique ROBDD pour chaque fonction binaire}
+\section{Un unique ROBDD pour chaque fonction binaire}
 
-On a vu précédement que l'on peut associer à toutes formules propositionnelles un ROBDD.\\
+On a vu précédement que l'on peut associer à toute formule propositionnelle un ROBDD.\\
 
-Mais la valuation d'une formule formule n'est rien d'autre qu'une fonction binaire $f :\mathbb{B}^n \to \mathbb{B}$.\\
+On pose la valuation d'une formule comme une fonction binaire $f :\mathbb{B}^n \to \mathbb{B}$ (où $n$ est le nombre de variable dans la formule).\\
 
-\textbf{Lemme (Canonicité): } Pour toute fonction $f :\mathbb{B}^n \to \mathbb{B}$ il existe exactement une ROBDD $u$ avec comme ordre $x_1 < x_2 < ... < x_n$ notée $f^u = f(x_1,x_2,...,x_n)$
+\textbf{Lemme (Canonicité): } Pour toute fonction $f :\mathbb{B}^n \to \mathbb{B}$ il existe exactement un ROBDD $u$ avec comme ordre $x_1 < x_2 < ... < x_n$ notée $f^u = f(x_1,x_2,...,x_n)$
 
 Pour simplifier la démonstration, on pose :\\
 \begin{center}
 $f_b(x_2,...,x_n) = f(b,x_2,...,x_n)$ où $b \in \mathbb{B}$\\
 \end{center}
 
-\textbf{Démonstration } Par induction sur n :\\
+\textbf{Démonstration } Par induction sur $n$ :\\
 
 Si $n = 0$\\
-Alors il n'existe que 2 fonctions binaires sans argument : $f = 0$ et $f = 1$.\\
-Et il n'y a que 2 ROBDD qui n'utilisent pas de variable : $0 (= false)$ et $1 (= true)$\\
+Alors il n'existe que deux fonctions binaires sans argument : $f = 0$ et $f = 1$.\\
+Et il n'y a que deux ROBDD qui n'utilisent pas de variable : $0 (= false)$ et $1 (= true)$\\
 Or $0$ est un ROBDD pour $f = 0$ mais pas pour $f = 1$ \\
 et $1$ est un ROBDD pour $f = 1$ mais pas pour $f = 0$ \\
-Donc il y a une unique ROBDD pour chaque $f :\mathbb{B}^0 \to \mathbb{B}$ \\
+Donc il y a un unique ROBDD pour chaque $f :\mathbb{B}^0 \to \mathbb{B}$ \\
 
 Si $n \neq 0$\\
 Supposons que le Lemme est vrai pour tout $k <= n$, montrons que le Lemme est aussi vrai pour $n+1$.\\
 
 Soit $f :\mathbb{B}^{n+1} \to \mathbb{B}$.
 Alors $f(x_1,...,x_{n+1}) = x_1 \rightarrow f_1(x_2,...,x_{n+1}), f_0(x_2,...,x_{n+1})$\\
-Par induction : Il y existe des uniques $u_0$ et $u_1$ tels que $f^{u_0} = f_0$ et $f^{u_1} = f_1$.\\
+Par induction : il y existe des uniques ROBDD $u_0$ et $u_1$ tels que $f^{u_0} = f_0$ et $f^{u_1} = f_1$.\\
 
 Il y a deux cas à considérer :\\
 
 Si $u_1 = u_0$ alors $f_0 = f^{u_0} = f^{u_1} = f_1$ donc $u_0 (= u_1)$ est aussi un ROBDD pour $f$. Qui est aussi unique dû à l'ordre.\\
-En effet, si $x_1$ se trouvait dans le ROBDD enracinée dans $u$ alors $var(u) = x_1$.\\
-Cependant $f = f^u$ alors $f_0 = f^u[0/x_1] = f^{low(u)}$ et $f_1 = f^u[1/x_1] = f^{high(u)}$ mais $f_0 = f_1$ alors par induction $low(u) = high(u)$ ce qui viol une des conditions des ROBDD.\\
+En effet, si $x_1$ se trouvait dans le ROBDD enraciné dans $u$ alors $var(u) = x_1$.\\
+Cependant $f = f^u$ alors $f_0 = f^u[0/x_1] = f^{low(u)}$ et $f_1 = f^u[1/x_1] = f^{high(u)}$ mais $f_0 = f_1$ alors par induction $low(u) = high(u)$ ce qui viole une des propriétés des ROBDD.\\
 
 Si $u_1 \neq u_0$ alors par induction $f_{u_0} \neq f_{u_1}$.\\
-Posons u tel que $var(u) = x_1$, $low(u) = u_0$ et $high(u) = u_1$ ainsi $f^u = x_1 \rightarrow f^{u_1}, f^{u_0}$\\
-Par induction $f^{u_1} = f_1$ et $f^{u_0} = f_0$ Or $f(x_1,...,x_{n+1}) = x_1 \rightarrow f_1(x_2,...,x_{n+1}), f_0(x_2,...,x_{n+1})$ donc $f = f^u$ \\
-Supposons v un noeuds tel que $f = f^v$. Clairement $f^v$ dépend de $x_1$. Donc $f^v[0/x_1] \neq f^v[1/x_1]$ (Sinon cela violerai le ROBDD).\\
+Construisons $u$ tel que $var(u) = x_1$, $low(u) = u_0$ et $high(u) = u_1$ ainsi $f^u = x_1 \rightarrow f^{u_1}, f^{u_0}$\\
+Par induction $f^{u_1} = f_1$ et $f^{u_0} = f_0$. Or $f(x_1,...,x_{n+1}) = x_1 \rightarrow f_1(x_2,...,x_{n+1}), f_0(x_2,...,x_{n+1})$ donc $f = f^u$ \\
+Supposons $v$ un ROBDD tel que $f = f^v$. Clairement $f^v$ dépend de $x_1$. Donc $f^v[0/x_1] \neq f^v[1/x_1]$ (Sinon cela violerait le ROBDD).\\
 Grâce à l'ordre $var(u) = x_1 = var(v)$.\\
 De plus $f^u = f$ donc $f^{low(v) = f_0 = f^{u_0}}$ et $f^{high(v) = f_1 = f^{u_1}}$ par induction $low(v) = u_0 = low(u)$ et $high(v) = u_1 = high(u)$.\\
-Donc par unicité des noeuds $u = v$
+Donc par unicité des ROBDD $u = v$
 
-%\section{A quoi correspond le graphe, et rapport avec $\varphi$}
-%\section{Représentation correcte -> pas de perte d'informations}
 
 %%%%% Chapitre 2 %%%%%%%
 \chapter{Construction d'une ROBDD}
@@ -487,8 +475,8 @@ Enfin, on indicera les variables par leur rang dans l'ordre : $x_n$ est la $n$-i
 L'algorithme est basé sur un principe récursif, on refait la même étape jusqu'à atteindre la condition de fin :
 \begin{enumerate}
 \item \label{order_eval} On détermine l'ordre d'évaluation des variables en fonction de l'ordre donné, pour obtenir un arbre ordonné.
-\item \label{start_eval} On évalue l'\expp donné en argument pour voir si la valuation n'est pas déjà déterminable. Par exemple, si on a $0 \wedge x$ avec $x$ une variable propositionnelle, alors on sait déjà que quelque soit la valuation de $x$, l'expression est fausse.
-\item Si la valuation est déterminé, on renvoie la nœud de l'arbre correspondant à la valeur de vérité correspondante (\textit{vrai} ou \textit{faux}).
+\item \label{start_eval} On évalue l'\expp donnée en argument pour voir si la valuation n'est pas déjà déterminable. Par exemple, si on a $0 \wedge x$ avec $x$ une variable propositionnelle, alors on sait déjà que quelque soit la valuation de $x$, l'expression est fausse.
+\item Si la valuation est déterminée, on renvoie la nœud de l'arbre correspondant à la valeur de vérité correspondante (\textit{vrai} ou \textit{faux}).
 \item Sinon, on crée le nœud \textit{low} et le nœud \textit{high} : 
  \begin{itemize}
 \item \textit{low} correspond au nœud créé quand on repasse par l'étape \ref{start_eval} où on a remplacé la variable évaluée par $0$ et où on évalue par la variable suivante dans l'ordre de l'étape \ref{order_eval}.
@@ -590,7 +578,7 @@ On obtient ainsi le nombre de solutions possibles.
 
 \subsection{AnySat}
 
-Lorsque la construction de l'arbre a été effectué, on peut déterminer en tant constant si une \expp est une antilogie (s'il n'y a qu'un seul nœud et qu'il correspond à \textit{faux}). De plus, on peut trouver, en temps linéaire du nombre de variables, une valuation satisfaisant notre \expp.
+Lorsque la construction de l'arbre a été effectuée, on peut déterminer en tant constant si une \expp est une antilogie (s'il n'y a qu'un seul nœud et qu'il correspond à \textit{faux}). De plus, on peut trouver, en temps linéaire du nombre de variables, une valuation satisfaisant notre \expp.
 
 \begin{lstlisting}
 let rec anySat (u : noeud) : (variable * bool) list =
@@ -602,7 +590,7 @@ let rec anySat (u : noeud) : (variable * bool) list =
     in
     fill_var 0 (aux u)
 \end{lstlisting}
-Il suffit de parcourir notre nœud racine et d'arriver jusqu'au nœud \textit{vrai}. Pour cela, on a choisi de passer par \textit{low}, mais on aurait très bien pu passé par \textit{high}, car si \textit{low} et \textit{high} existe et sont différents de \textit{faux}, alors il y a un chemin permettant d'aller à \textit{vrai}.\\
+Il suffit de parcourir notre nœud racine et d'arriver jusqu'au nœud \textit{vrai}. Pour cela, on a choisi de passer par \textit{low}, mais on aurait très bien pu passer par \textit{high}, car si \textit{low} et \textit{high} existe et sont différents de \textit{faux}, alors il y a un chemin permettant d'aller à \textit{vrai}.\\
 On est en temps linéaire du nombre de variable car à chaque itération, on descend d'un cran vers \textit{vrai}, et donc on donne une valuation à chaque variable.\\
 La dernière opération, appelé \textit{fill\_var}, permet de remplir la solution en attribuant une valeur de vérité à toutes les variables dont un nœud correspondant n'a pas été visité. Cela permet d'obtenir une solution attribuant une valeur de vérité à chaque variable.
 
@@ -629,7 +617,7 @@ Prenons l'\expp suivante :
 $$A = ((x_1 \wedge x_3) \Leftrightarrow (x_3 \vee x_4)) \Rightarrow ((\neg x_2) \wedge x_1)$$
 
 On va faire les différentes étapes de l'algorithme.\\
-Première chose, on va définir l'ordre suivante : $x_1 < x_2 < x_3 < x_4$.
+Première chose, on va définir l'ordre suivant : $x_1 < x_2 < x_3 < x_4$.
 
 
 \begin{figure}[h]
@@ -700,7 +688,7 @@ Première chose, on va définir l'ordre suivante : $x_1 < x_2 < x_3 < x_4$.
 
 Première étape, on prend notre \expp, et on cherche \textit{low} et \textit{high} donc on donne une valeur de vérité à la variable $x_1$.\\
 Tout d'abord, on associe $0$ à $x_1$, et on arrive en $C = x_3 \vee x_4  $.\\
-Ensuite, $C$ n'est pas un état terminal, donc on doit déterminer son \textit{low} et \textit{high} pour la variable $x_3$ car ni la variable $x_1$, ni la variable $x_2$ n'existe.\\
+Ensuite, $C$ n'est pas un état terminal, donc on doit déterminer son \textit{low} et \textit{high} pour la variable $x_3$ car ni la variable $x_1$, ni la variable $x_2$ n'existent.\\
 Donc à l'étape 2, on cherche \textit{low} (on associe $0$ à $x_3$) et on arrive dans le nœud $E = x_4$.\\
 On n'est toujours pas dans un état terminal, donc on cherche le \textit{low} et le \textit{high} de $E$.\\
 On commence d'abord par \textit{low}, donc on associe $0$ à $x_4$ et là on se retrouve dans l'état terminal \textit{faux} (étape 3).\\
@@ -932,7 +920,7 @@ ALLSAT(racine) & $O(max(2^{|arbre|}, 2^n))$ & Nombre de solutions possibles \\
 \end{tabular} 
 \end{center}
 
-On remarque que la fonction ANYSAT est en tant constant du nombre de variable, mais il faut prendre en compte qu'on a construit au préalable l'\adboc correspondant.\\
+On remarque que la fonction ANYSAT est en tant linéaire au nombre de variable, mais il faut prendre en compte qu'on a construit au préalable l'\adboc correspondant.\\
 Le plus gros de la complexité de l'algorithme se fait donc au niveau de la fonction BUILD.\\
 On va voir dans la partie d'après nos réflexions là-dessus.
 
@@ -941,26 +929,24 @@ On va voir dans la partie d'après nos réflexions là-dessus.
 
 \section{Sat-solveur mais mauvais}
 
-La première utilisation des ROBDD est en tant que Sat-solveur. En effet, le fait de savoir si une formule admet une solution se fait en temps constant, dès que l'on a son ROBDD, car si la formule n'admet pas de solution alors elle est une antologie et par unicité des ROBDD, le ROBDD qui lui est associé est $0$.\\
-Et donc il suffit de comparer le premier noeud du ROBDD à 0 pour savoir si il existe une solution.\\
+La première utilisation des ROBDD est en tant que Sat-solveur. En effet, le fait de savoir si une formule admet une solution se fait en temps constant, dès que l'on a son ROBDD, car si la formule n'admet pas de solution alors elle est une antologie et par unicité des ROBDD, le ROBDD qui lui est associée est $0$.\\
+Et donc il suffit de comparer le premier noeud du ROBDD à $0$ pour savoir si il existe une solution.\\
 
 Suite à ceci, il est possible de trouver l'ensemble de solution à partir du ROBDD en le parcourant et en retenant tout le chemin qui mènent au noeud $1$.\\
 
 On utilise ici les fonctions ANYSAT et ALLSAT (Et SATCOUNT si l'on n'a besoin uniquement du nombre de solution).\\
 
-De là il est possible de résoudre des problèmes logique comme le Problème des N Reines, le Sudoku ou encore des BenchMarks.\\
+De là il est possible de résoudre des problèmes logiques comme le Problème des N Reines, le Sudoku ou encore des BenchMarks.\\
 
-Exemple : Problème des 5 Reines\\
+Exemple : Problème des 4 Reines\\
 
 \begin{figure}[h]
-\includegraphics[width=200px]{exemple/queen_4.pdf}
+\includegraphics[scale = 0.18]{exemple/queen_4.pdf}
 \end{figure}
 
 Avec un total de 2 solutions.\\
 
-La raison pour laquelle ce Sat-solveur n'est pas utilisé est que ,bien que la compléxité de l'algorithme ANYSAT soit linéaire, la fonction BUILD est de compléxité exponentielle.
-
-\newpage
+La raison pour laquelle ce Sat-solveur n'est pas utilisé est que, bien que la compléxité de l'algorithme ANYSAT soit linéaire, la fonction BUILD est de compléxité exponentielle.
 
 \section{Correction et Equivalence de la combinatoire de circuit}
 
@@ -968,23 +954,20 @@ Lorsque l'on a le ROBDD d'une formule, il est assez facile de voir qu'elles sont
 Donc une des principales utilisations des ROBDD et pour la correction ou équivalence de circuit (logique).\\
 
 En effet, il est assez évident de voir qu'un circuit logique peut être représenté par une formule.\\
-Les entrées sont les variables et les portes les opérations logiques (souvent unaire comme la porte 'N', ou binaire comme les portes 'OR', 'AND', 'NOR', 'XOR' ...).\\
+Les entrées sont les variables et les portes les opérations logiques (souvent unaire comme la porte 'NON', ou binaire comme les portes 'OR', 'AND', 'NOR', 'XOR' ...).\\
 
 Comme par exemple : un Circuit d'équivalence \\
 
 \begin{figure}[h]
-   \begin{minipage}[c]{\largeur}
-      \begin{circuitikz}
-
-    
-    \node[and port](AND) at (3,2) {};
-    \node[nor port](NOR) at (3,0) {};
-    \node[or port] (OR) at (5,1) {};
+  \begin{circuitikz}[shorten >=1pt,node distance=0.5cm]
+    \node[and port](AND) at (3,2) {\hspace{-1em}and};
+    \node[nor port](NOR) at (3,0) {\hspace{-0.8em}nor};
+    \node[or port] (OR) at (5,1) {\hspace{-0.6em}or};
     \node		    (X) at (0,2) {$x$};
     \node            (Y) at (0,0) {$y$};
     \node            (Z) at (6,1) {$z$};
-    \node            (XP) at (1.1,2) {\textbullet};
-    \node            (YP) at (0.7,0) {\textbullet};
+    \node[fill,circle,inner sep=0pt,minimum size=1pt]            (XP) at (1.1,2) {\textbullet};
+    \node[fill,circle,inner sep=0pt,minimum size=1pt]            (YP) at (0.7,0) {\textbullet};
 
     \draw (X) -* (XP);
     \draw (XP) |- (AND.in 1);
@@ -996,14 +979,12 @@ Comme par exemple : un Circuit d'équivalence \\
     \draw (NOR.out) |- (OR.in 2);
     \draw (OR.out) |- (Z);
 	
-\end{circuitikz}
-   \end{minipage} \hfill
+  \end{circuitikz}
 \end{figure}
 
 De formule : $((x \wedge y) \vee (\neg(x \vee y)))$
 
 \begin{figure}[h]
-   \begin{minipage}[c]{\largeur}
       \begin{tikzpicture}[shorten >=1pt,node distance=1cm]
 \node 			(N) at (0,3)		{ROBDD d'ordre : $x < y$};
   \node[state]		   (X) at (0,2)         {$x$};
@@ -1024,13 +1005,11 @@ De formule : $((x \wedge y) \vee (\neg(x \vee y)))$
 		(Y1) edge              node {} (Z1);
 	
 \end{tikzpicture}
-   \end{minipage} \hfill
 \end{figure}
 
 Pour la traduction des circuits en ROBDD sans passer par la formule revient à créer des ROBDDs pour chaque variables :
 
 \begin{figure}[h]
-   \begin{minipage}[c]{\largeur}
       \begin{tikzpicture}[shorten >=1pt,node distance=1cm]
 \node 			(N) at (0,2.5)		{Variable : x};
   \node[state]		   (X) at (0,1.5)         {$x$};
@@ -1045,7 +1024,6 @@ Pour la traduction des circuits en ROBDD sans passer par la formule revient à c
         (X) edge              node {} (Z);
 	
 \end{tikzpicture}
-   \end{minipage} \hfill
 \end{figure}
 
 Puis d'appliquer la fonction APPLY en fonction des portes logiques utiles.\\
@@ -1079,21 +1057,36 @@ let apply (op : node->node->node) (u1 : node) (u2 : node) : node =
     aux u1 u2
 \end{lstlisting}
 
-APPLY est un fonction qui nous permet de réunir deux ROBDD par un opérateur $op$ (dans notre cas les différentes portes). Son principe est récursif : On crée un nouveau noeud de $var$ prioritaire par rapport à l'ordre des $var$ des deux noeuds à réunir. On réunit les noeuds $low$ des deux noeuds en fonction de leur priorité dans l'ordre et fait de même pour les $high$. Ces deux nouveaux noeuds sont respectivement le $low$ et le $high$ du nouveau noeud. Si les noeuds à réunir sont des $1$ et/ou des $0$, on applique l'opérateur.\\
+APPLY est un fonction qui nous permet de réunir deux ROBDD par un opérateur $op$ (dans notre cas les différentes portes). Son principe est récursif : On crée un nouveau noeud de $var$ prioritaire par rapport à l'ordre des $var$ des deux noeuds à réunir. On réunit les noeuds $low$ des deux noeuds en fonction de leur priorité dans l'ordre et fait de même pour les $high$. Ces deux nouveaux noeuds sont le $low$ et le $high$ du nouveau noeud. Si les noeuds à réunir sont des $1$ et $0$, on applique l'opérateur.\\
 
-APPLY ne viole pas les règles des ROBDD car elle utilise mk qui gère l'unicité des noeuds et la non-redondance et l'ordre est gèré directement dans l'algorithme avec les conditions $c1, c2, c3$.\\
+APPLY ne viole pas les règles des ROBDD car elle utilise MK qui gère l'unicité des noeuds et la non-redondance et l'ordre est gèré directement dans l'algorithme avec les conditions $c1, c2, c3$.\\
 
 Utiliser APPLY nous permet alors de juste parcourir le circuit et construire le ROBDD en même temps.\\
 
 
-Ainsi, vérifier qu'un circuit logique donne les bons résultats devient très simple avec son ROBDD et montrer que deux circuits soient équivalents revient à remarquer que les deux ROBDD soient exactement les même (par unicité des ROBDD).
+Ainsi, vérifier qu'un circuit logique donne les bons résultats devient très simple avec son ROBDD et montrer que deux circuits sont équivalents revient à remarquer que les deux ROBDD sont exactement les mêmes (par unicité des ROBDD).
 
 
 \newpage
 
 \section{Théorie sur les ordres}
 
-% Rien Encore!
+Lors de nos recherches, nous avons remarqué que pour des ordres différents, une même expression Booléenne pouvait avoir des ROBDDs différents.\\
+Nous avons observé que pour certaine expression le nombre de noeud des ROBDD pouvait considérablement diminuer en fonction de l'ordre choisi a tel point que l'execution de BUILD n'était plus qu'en $O(n)$ au lieu de $2^n$ (où $n$ est le nombre de variable de l'expression).\\
+
+\begin{figure}[h]
+      \includegraphics[scale = 0.5]{exemple/bon_Ordre.pdf}
+      \includegraphics[scale = 0.5]{exemple/mauvais_Ordre.pdf}
+    \caption{ROBDD d'ordre $x_1<x_2<x_3<x_4<x_5<x_6$ puis d'ordre $x_1<x_3<x_5<x_2<x_4<x_6$ de la formule : $ (x_1 \vee x_2) \wedge (x_3 \vee x_4) \wedge (x_5 \vee x_6)$}
+\end{figure}
+
+Nous nous sommes donc demandé si pour chaque expression Booléenne il existe un ordre qui permet d'obtenir, via la fonction BUILD, un ROBDD en temps linéaire, et dans le cas où il existe, comment le trouver.\\
+
+% L'ordre existe-t-il ?
+
+Malheuresement, il s'avère que trouver le meilleur ordre (celui qui donne un nombre minimal de noeud dans le ROBDD) est un problème NP-Complet % NP-Dur
+ce qui ne permet pas de réduire la compléxité de la fonction BUILD.
+
 
 %%%%% Conclusion %%%%%%%
 \chapter*{Conclusion}

@@ -25,6 +25,10 @@ let impl_simple : int exp = Im(Var 0, Var 1)
 let big : int exp = Eq(Et(Im(Var 0, Var 1), No(Var 4)), Im(Ou(No(Var 1), Var 3), Im(Et(Var 0, No(Var 2)), Eq(Var 2, Ou(Var 4, No(Var 3))))));;
 (*(((A->B)^-E)<->((-BvD)->((A^-C)->(c<->(Ev-D)))))*)
 
+let ou_et_g : int exp = Et(Et(Ou(Var 1, Var 2), Ou(Var 3, Var 4)), Ou(Var 5, Var 6));;
+
+let ou_et_b : int exp = Et(Et(Ou(Var 1, Var 5), Ou(Var 2, Var 4)), Ou(Var 3, Var 6));;
+
 let main (e : Test_exp.t exp) (str : string): unit = T.re_init (); T.main_expression e ("rapport/exemple/" ^ str ^ ".dot")
 
 let worse n = main (Worse.worse n) ("worse_"^string_of_int n)
@@ -39,6 +43,9 @@ let combinatoire k n = main (Combinat.create k n) ("combinatoire_" ^ string_of_i
    let _ = main impl "impl"
    let _ = main big "big" *)
 (* let _ = worse 15 *)
+
+(* *)let _ = main ou_et_g "bon_Ordre"
+(* *)let _ = main ou_et_b "mauvais_Ordre"
 
 let ordre () =
   let permut = Worse.all_permut [|1;3;4;2|] in
