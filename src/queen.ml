@@ -97,3 +97,5 @@ let create_all n =
   Et (one, impl)
 
 let main_queen n = Test.main (create_all n) ("queen_"^ string_of_int n)
+
+let _ = main_queen 5
