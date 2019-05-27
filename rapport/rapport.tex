@@ -946,7 +946,9 @@ Exemple : Problème des 4 Reines\\
 
 Avec un total de 2 solutions.\\
 
-La raison pour laquelle ce Sat-solveur n'est pas utilisé est que, bien que la compléxité de l'algorithme ANYSAT soit linéaire, la fonction BUILD est de compléxité exponentielle.
+La raison pour laquelle ce Sat-solveur n'est pas utilisé est que, bien que la compléxité de l'algorithme ANYSAT soit linéaire, la fonction BUILD est de compléxité exponentielle.\\
+
+Ainsi, des problèmes qui demandent de gros caluls, deviennent vraiment long à résoudre. Comme par exemple le Problème du Sudoku (vide) qui comporte plus de $6*10^{21}$ solutions
 
 \section{Correction et Equivalence de la combinatoire de circuit}
 
@@ -1080,12 +1082,9 @@ Nous avons observé que pour certaine expression le nombre de noeud des ROBDD po
     \caption{ROBDD d'ordre $x_1<x_2<x_3<x_4<x_5<x_6$ puis d'ordre $x_1<x_3<x_5<x_2<x_4<x_6$ de la formule : $ (x_1 \vee x_2) \wedge (x_3 \vee x_4) \wedge (x_5 \vee x_6)$}
 \end{figure}
 
-Nous nous sommes donc demandé si pour chaque expression Booléenne il existe un ordre qui permet d'obtenir, via la fonction BUILD, un ROBDD en temps linéaire, et dans le cas où il existe, comment le trouver.\\
+Nous nous sommes donc demandé comment trouver le meilleur ordre (celui qui donne un nombre minimal de noeud dans le ROBDD) pour une expression Booléenne donnée afin d'améliorer notre algorithme.
 
-% L'ordre existe-t-il ?
-
-Malheuresement, il s'avère que trouver le meilleur ordre (celui qui donne un nombre minimal de noeud dans le ROBDD) est un problème NP-Complet % NP-Dur
-ce qui ne permet pas de réduire la compléxité de la fonction BUILD.
+Malheuresement, il s'avère que trouver le meilleur ordre est un problème NP-Complet ce qui ne permet pas de réduire la compléxité de la fonction BUILD.
 
 
 %%%%% Conclusion %%%%%%%
