@@ -16,6 +16,7 @@
 \usepackage{xcolor}
 \usepackage{graphicx}
 \usepackage{tikz}
+\usepackage{titling}
 \usepackage{circuitikz}
 \usetikzlibrary{arrows,automata}
 \definecolor{darkgreen}{rgb}{0, 0.6, 0}
@@ -46,13 +47,22 @@
 \newcommand{\expps}{expressions~propositionnelles~}
 \newcommand{\ssi}{si~et~seulement~si~}
 
+\newcommand{\largeur}{0.5\linewidth}
+
 \begin{document}
 
+\pretitle{%
+  \begin{center}
+  \LARGE
+  \includegraphics[scale=0.7]{diderot_up.jpg}\\[\bigskipamount]
+}
+\posttitle{\end{center}}
 
-\title{Arbre de décision binaire - \textit{ROBDD} en anglais \\ Rapport pour le projet Mathématique et Informatique de L3 de 2018-2019  }
+\title{Arbre de décision binaire - \textit{ROBDD} \\ Rapport pour le projet Mathématique et Informatique de L3 de 2018-2019  }
 \date{\today}
 \author{Sébastien Palmer et Xavier Durand \\~\\ Encadré par Sedki Boughattas }
 \maketitle
+
 
 \tableofcontents{}
 
@@ -217,17 +227,19 @@ On a vu précédement que toute expression Booléenne est équivalente à une ex
 
 Exemple : Soit $t = ( x_1 \Leftrightarrow y_1 ) \wedge ( x_2 \Leftrightarrow y_2 )$.\\
 On peut donc appliquer l'expansion de Shannon :
-\begin{center}
-$t = x_1 \rightarrow t_1, t_0)$\\
-$t_0 = y_1 \rightarrow 0, t_{00})$\\
-$t_1 = y_1 \rightarrow t_{11}, 0)$\\
-$t_{00} = x_2 \rightarrow t_{001}, t_{000})$\\
-$t_{11} = x_2 \rightarrow t_{111}, t_{110})$\\
-$t_{000} = y_2 \rightarrow 0, 1)$\\
-$t_{001} = y_2 \rightarrow 1, 0)$\\
-$t_{110} = y_2 \rightarrow 0, 1)$\\
-$t_{111} = y_2 \rightarrow 1, 1)$\\
-\end{center}
+$$
+\begin{array}{lcl}
+t = x_1 \rightarrow t_1, t_0&&\\
+t_0 = y_1 \rightarrow 0, t_{00}&&\\
+t_1 = y_1 \rightarrow t_{11}, 0&&\\
+t_{00} = x_2 \rightarrow t_{001}, t_{000}&&\\
+t_{11} = x_2 \rightarrow t_{111}, t_{110}&&\\
+t_{000} = y_2 \rightarrow 0, 1&&\\
+t_{001} = y_2 \rightarrow 1, 0&&\\
+t_{110} = y_2 \rightarrow 0, 1&&\\
+t_{111} = y_2 \rightarrow 1, 1&&\\
+\end{array}
+$$
 
 \section{Les ROBDD et leurs propriétés}
 
@@ -251,9 +263,8 @@ On représente donc une expression par le noeud racine.\\
 
 Avec l'exemple précédent, on obtient le BDD suivant :
 
-\newcommand{\largeur}{0.5\linewidth}
-
 \begin{figure}[h]
+\centering
       \begin{tikzpicture}[shorten >=1pt,node distance=1cm]
 \node[state]		   (X1) at (0,4)         {$x_1$};
   \node[state]		   (Y11) at (-1,3)         {$y_1$};
@@ -298,6 +309,7 @@ Avec l'exemple précédent, on obtient le BDD suivant :
         (Y23) edge              node {} (F5)
         (Y24) edge              node {} (T4);
     \end{tikzpicture}
+\caption{BDD de $( x_1 \Leftrightarrow y_1 ) \wedge ( x_2 \Leftrightarrow y_2 )$}
 \end{figure}
 
 Si les variables apparaîssent dans un même ordre tout au long de la construction du BDD, on dit que le diagramme est \textit{ordonné} (OBDD).\\
@@ -305,35 +317,36 @@ Si les variables apparaîssent dans un même ordre tout au long de la constructi
 On remarque certains noeuds sont dupliqués.\\
 Ainsi, dans l'exemple lors de la construction, on réduit par :
 
-\begin{center}
-$t_{000} = t_{110}$\\
-$t_{001} = t_{111}$\\
-$t_{00} = t_{11}$\\
-\end{center}
+$$\begin{array}{lcl}
+t_{000} = t_{110}&&\\
+t_{001} = t_{111}&&\\
+t_{00} = t_{11}&&\\
+\end{array}$$
 
 Et on obtient :
 
-\begin{center}
-$t = x_1 \rightarrow t_1, t_0)$\\
-$t_0 = y_1 \rightarrow 0, t_{00})$\\
-$t_1 = y_1 \rightarrow t_{00}, 0)$\\
-$t_{00} = x_2 \rightarrow t_{001}, t_{000})$\\
-$t_{000} = y_2 \rightarrow 0, 1)$\\
-$t_{001} = y_2 \rightarrow 1, 0)$\\
-\end{center}
+$$\begin{array}{lcl}
+t = x_1 \rightarrow t_1, t_0&&\\
+t_0 = y_1 \rightarrow 0, t_{00}&&\\
+t_1 = y_1 \rightarrow t_{00}, 0&&\\
+t_{00} = x_2 \rightarrow t_{001}, t_{000}&&\\
+t_{000} = y_2 \rightarrow 0, 1&&\\
+t_{001} = y_2 \rightarrow 1, 0&&\\
+\end{array}$$
 
 Le diagramme devient donc :\\
 
 \begin{figure}[h]
+\centering
       \begin{tikzpicture}[shorten >=1pt,node distance=1cm]
 \node[state]		   (X1) at (0,4)         {$x_1$};
-  \node[state]		   (Y11) at (-1,3)         {$y_1$};
-  \node[state]		   (Y12) at (1,3)         {$y_1$};
+  \node[state]		   (Y11) at (-1.8,3)         {$y_1$};
+  \node[state]		   (Y12) at (1.8,3)         {$y_1$};
   \node[state]		   (X2) at (0,2)         {$x_2$};
-  \node[state]		   (Y21) at (-1,1)         {$y_2$};
-  \node[state]		   (Y22) at (1,1)         {$y_2$};
-  \node[state, accepting, below]		   (T) at (0.5,0)         {$1$};
-  \node[state, accepting, below]		   (F) at (-0.5,0)         {$0$};
+  \node[state]		   (Y21) at (-2,1)         {$y_2$};
+  \node[state]		   (Y22) at (2,1)         {$y_2$};
+  \node[state, accepting, below]		   (T) at (0.8,0)         {$1$};
+  \node[state, accepting, below]		   (F) at (-0.8,0)         {$0$};
 
 
   \path[->,>=stealth', dashed] 
@@ -352,6 +365,7 @@ Le diagramme devient donc :\\
         (Y21) edge              node {} (F)
         (Y22) edge              node {} (T);
     \end{tikzpicture}
+\caption{ROBDD de $( x_1 \Leftrightarrow y_1 ) \wedge ( x_2 \Leftrightarrow y_2 )$}
 \end{figure}
 
 Si tout noeud redondant a été supprimé et tous noeuds identiques ont été réduits, on dit que le diagramme est \textit{réduit} (ROBDD).\\
@@ -361,14 +375,10 @@ Un ROBDD admet donc plusieurs propriétés :
 \begin{itemize}
 \item Contient un ou deux noeud terminaux ($0$ et/ou $1$)
 \item Contient un ensemble de noeuds $u$ non-terminaux de degré 2 ($var(u)$ la variable $x$ du noeud, $low(u)$ le noeud de $t[0/x]$, $high(u)$ le noeud de $t[1/x]$)
-\item Les var(u) des noeuds respectent un ordre en fonction de leur place dans le diagramme ($x_1 < x_2 < ... < x_n$)
-\item Soit 2 noeuds $u$ et $v$, si $var(u) = var(v)$, $low(u) = low(v)$ et $high(u) = high(v)$ alors $u = v$
-\item Soit $u$ un noeud alors $low(u) \neq high(u)$
-\end{itemize}
-
+\item Les var(u) des noeuds respectent un ordre en fonction de leur place dans le diagramme ($x_1 < x_2 < ... < x_n$). Cela correspond à l'ordonnancement des variables :
 \begin{figure}[h]
+\centering
       \begin{tikzpicture}[shorten >=1pt,node distance=1cm]
-\node 			(N) at (0,3)		{Ordonnée : x < y, x < z};
   \node[state]		   (X) at (0,1.5)         {$x$};
   \node[state]         (Y) at (-1,0)		 {$y$};
   \node[state]         (Z) at (1,0)		 {$z$};
@@ -381,8 +391,12 @@ Un ROBDD admet donc plusieurs propriétés :
         (X) edge              node {} (Z);
 	
 \end{tikzpicture}
-      \begin{tikzpicture}[shorten >=1pt,node distance=1cm]
-\node 			(N) at (0,3)		{Unique};
+\caption{Ordonnée : x < y, x < z}
+\end{figure}
+\item Soit 2 noeuds $u$ et $v$, si $var(u) = var(v)$, $low(u) = low(v)$ et $high(u) = high(v)$ alors $u = v$ : propriété de l'unicité.
+\begin{figure}[h]
+\centering
+\begin{tikzpicture}[shorten >=1pt,node distance=1cm]
   \node[state]		   (X) at (-1,1.5)         {$x$};
   \node[state]		   (X2) at (1,1.5)         {$x$};
   \node[state]         (Y) at (-1,0)		 {$y$};
@@ -399,8 +413,12 @@ Un ROBDD admet donc plusieurs propriétés :
         (X2) edge              node {} (Z);
 
 \end{tikzpicture}
+\caption{Représentation graphique de l'unicité}
+\end{figure}
+\item Soit $u$ un noeud alors $low(u) \neq high(u)$ : la non-redondance.
+\begin{figure}[h]
+\centering
       \begin{tikzpicture}[shorten >=1pt,node distance=1cm]
-\node 			(N) at (0,3)		{Non-redondant};
   \node[state]		   (X) at (0,1.5)         {$x$};
   \node[state]         (Y) at (0,0)		 {$y$};
 
@@ -413,8 +431,9 @@ Un ROBDD admet donc plusieurs propriétés :
   (X) edge              node {} (Y);
 
 \end{tikzpicture}
+\caption{Représentation graphique de la non-redondance}
 \end{figure}
-
+\end{itemize}
 
 \section{Un unique ROBDD pour chaque fonction binaire}
 
@@ -938,13 +957,13 @@ On utilise ici les fonctions ANYSAT et ALLSAT (Et SATCOUNT si l'on n'a besoin un
 
 De là il est possible de résoudre des problèmes logiques comme le Problème des N Reines, le Sudoku ou encore des BenchMarks.\\
 
-Exemple : Problème des 4 Reines\\
-
+\paragraph{Exemple} : Problème des 4 Reines
 \begin{figure}[h]
+\centering
 \includegraphics[scale = 0.18]{exemple/queen_4.pdf}
 \end{figure}
 
-Avec un total de 2 solutions.\\
+On peut lire graphiquement que le problème des 4 reines possède un total de 2 solutions.\\
 
 La raison pour laquelle ce Sat-solveur n'est pas utilisé est que, bien que la compléxité de l'algorithme ANYSAT soit linéaire, la fonction BUILD est de compléxité exponentielle.\\
 
@@ -961,6 +980,7 @@ Les entrées sont les variables et les portes les opérations logiques (souvent 
 Comme par exemple : un Circuit d'équivalence \\
 
 \begin{figure}[h]
+\centering
   \begin{circuitikz}[shorten >=1pt,node distance=0.5cm]
     \node[and port](AND) at (3,2) {\hspace{-1em}and};
     \node[nor port](NOR) at (3,0) {\hspace{-0.8em}nor};
@@ -980,15 +1000,13 @@ Comme par exemple : un Circuit d'équivalence \\
     \draw (AND.out) |- (OR.in 1);
     \draw (NOR.out) |- (OR.in 2);
     \draw (OR.out) |- (Z);
-	
   \end{circuitikz}
+\caption{Circuit correspondant à l'\expp $((x \wedge y) \vee (\neg(x \vee y)))$}
 \end{figure}
 
-De formule : $((x \wedge y) \vee (\neg(x \vee y)))$
-
 \begin{figure}[h]
+\centering
       \begin{tikzpicture}[shorten >=1pt,node distance=1cm]
-\node 			(N) at (0,3)		{ROBDD d'ordre : $x < y$};
   \node[state]		   (X) at (0,2)         {$x$};
   \node[state]         (Y0) at (-1,1)		 {$y$};
   \node[state]         (Y1) at (1,1)		 {$y$};
@@ -1007,14 +1025,31 @@ De formule : $((x \wedge y) \vee (\neg(x \vee y)))$
 		(Y1) edge              node {} (Z1);
 	
 \end{tikzpicture}
+\caption{Représentation du circuit sous ROBDD d'ordre : $x < y$}
 \end{figure}
 
 Pour la traduction des circuits en ROBDD sans passer par la formule revient à créer des ROBDDs pour chaque variables :
 
 \begin{figure}[h]
+\centering
       \begin{tikzpicture}[shorten >=1pt,node distance=1cm]
-\node 			(N) at (0,2.5)		{Variable : x};
+\node 			(N) at (0,2.5)		{Variable : $x$};
   \node[state]		   (X) at (0,1.5)         {$x$};
+  \node[state]         (Y) at (-1,0)		 {$0$};
+  \node[state]         (Z) at (1,0)		 {$1$};
+
+
+  \path[->,>=stealth', dashed] 
+		(X) edge              node {} (Y);
+		
+  \path[->,>=stealth'] 
+        (X) edge              node {} (Z);
+	
+\end{tikzpicture}
+\hspace{5em}
+\begin{tikzpicture}[shorten >=1pt,node distance=1cm]
+\node 			(N) at (0,2.5)		{Variable : $y$};
+  \node[state]		   (X) at (0,1.5)         {$y$};
   \node[state]         (Y) at (-1,0)		 {$0$};
   \node[state]         (Z) at (1,0)		 {$1$};
 
@@ -1029,8 +1064,6 @@ Pour la traduction des circuits en ROBDD sans passer par la formule revient à c
 \end{figure}
 
 Puis d'appliquer la fonction APPLY en fonction des portes logiques utiles.\\
-
-\newpage
 
 \begin{lstlisting}
 let apply (op : node->node->node) (u1 : node) (u2 : node) : node =
