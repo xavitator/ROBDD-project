@@ -1,5 +1,4 @@
 \documentclass[a4paper, oneside]{report}
-
 \usepackage[top=3cm, bottom = 3cm, left = 3cm, right =3cm]{geometry}
 \usepackage{amsfonts,amsmath,amssymb}
 \usepackage[utf8]{inputenc}
@@ -49,7 +48,7 @@
 \begin{document}
 
 
-\title{Arbre de décision binaire - \textit{ROBDD} en anglais \\ Rapport pour le projet Mathématique et Informatique de L3 de 2018-2019  }
+\title{Arbre de décision binaire ordonné canonique \\ \textit{ROBDD} en anglais \\ Rapport pour le projet Mathématique et Informatique de L3 de 2018-2019  }
 \date{\today}
 \author{Sébastien Palmer et Xavier Durand \\~\\ Encadré par Sedki Boughattas }
 \maketitle
@@ -144,19 +143,25 @@ $1$ & $0$ & $1$ \\
 Ces connecteurs logiques ne sont bien évidemment pas les seuls à exister, mais ce sont ceux qu'on accepte dans notre algorithme qu'on présentera plus tard.
 
 \subsubsection{Expression propositionnelle}
-Une \expp correspond à une suite de variables propositionnelles liées par des connecteurs logiques.\\
+Une \expp, appelée aussi formule, est définie récurcivement de la façon suivante :
+
+\begin{itemize}
+\item Toute variable propositionnelle est une formule.
+\item Si $F$ est une formule alors $\neg F$ l'est aussi.
+\item Si $F$ et $G$ sont deux formules et $\alpha \in \{\wedge, \vee, \Rightarrow, \Leftrightarrow\}$ alors $(F \alpha G)$ est aussi une formule
+\end{itemize}
 Voici un exemple d'\expp :
 $$(x \wedge y) \vee ((\neg z) \Rightarrow (x \Leftrightarrow t))$$
 avec $x,y,z$ et $t$ des variables propositionnelles.\\
 
 Par soucis de lisibilité, lorsqu'on écrira une expression propositionnelle, on ajoutera des parenthèses.\\
 Prenons l'expression $x\wedge y\vee 1$. On ne va pas avoir la même table de vérité si on écrit $(x\wedge y)\vee 1$ (qui sera toujours vrai) et si on écrit $x \wedge (y \vee 1)$ (qui sera faux si $x$ est faux).\\
-Cependant, il y a des expressions qui sont commutatives, et donc on peut omettre les parenthèses dans ces cas précis. Ces expressions commutatives sont la succession de conjonction et la succession de disjonction. Les tables de vérité des deux \expps suivantes ne change pas quelque soit la position des parenthèses :
-$$x \wedge y \wedge z \hspace{2em} et \hspace{2em} x \vee y \vee z$$
+Cependant, grâce à l'associativité de $\vee$, celle de $\wedge$ et des règles de priorité fixées, on peut omettre les parenthèses dans certaines expressions. Comme par exemple :
+$$x \wedge y \wedge z \hspace{2em} et \hspace{2em} \neg x \Rightarrow y \vee z$$
 
 \section*{Qu'est ce qu'une ROBDD (présentation rapide)}
 
-\noindent Nous allons ensuite introduire la notion d'arbre de décision binaire, on le notera \textit{ADB}. Cela se présente de la sorte :
+\noindent Nous allons ensuite introduire la notion d'arbre de décision binaire, on le notera \textit{ADB} ou \textit{BDD} en anglais (Binary Decision Diagram). Cela se présente de la sorte :
 
 \begin{figure}[htbp]
   \centering
@@ -169,11 +174,11 @@ La flèche en pointillée représente le chemin à emprunter si la variable corr
 Ici, on voit bien que si $x_0$ est faux, alors l'implication est vrai, quelque soit la valeur de vérité de $x_1$.\\
 Si $x_0$ est vrai, alors il faut regarder la valeur de vérité de $x_1$ : si $x_1$ est vrai, alors l'implication est vraie et si $x_1$ est faux alors l'implication est fausse.\\
 
-Ici, on a aussi introduit l'idée que cet arbre est ordonné, qu'on notera \textit{ADBO} (arbre de décision binaire ordonné).\\
+Ici, on a aussi introduit l'idée que cet arbre est ordonné, qu'on notera \textit{ADBO} (arbre de décision binaire ordonné) ou \textit{OBDD} en anglais (Ordered Binary Decision Diagram).\\
 Il faut donner un ordre aux variables pour savoir dans quel ordre on va attribuer une valeur de vérité aux variables pour former l'arbre.\\
 On le présentera plus en détail plus tard, mais il s'avère que l'arbre dépend de l'ordre choisi : on peut obtenir un arbre plus petit avec un certain ordre et un autre beaucoup plus grand avec un autre ordre.\\
 
-Enfin, introduisons la notion d'unicité de cet arbre. La construction de l'arbre est unique en fonction de l'ordre choisi, c'est à dire qu'en ayant fixé un ordre, toutes les expressions équivalentes posséderont le même ADB. On le notera \textit{ADBOC} (arbre de décision binaire ordonné canonique).\\
+Enfin, introduisons la notion d'unicité de cet arbre. La construction de l'arbre est unique modulo l'ordre choisi, c'est à dire qu'en ayant fixé un ordre, toutes les expressions équivalentes posséderont le même ADB. On le notera \textit{ADBOC} (arbre de décision binaire ordonné canonique) ou \textit{ROBDD} en anglais (Reduced Ordered Binary Decision Diagram).\\
  
 \section*{Organisation}
 On va ici vous présenter les résultats de notre recherche sur le sujet.\\
@@ -203,9 +208,9 @@ Tout les operateurs peuvent assez facilement être traduits en utilisant uniquem
 
 où $A$ et $B$ sont des variables propositionnelles.\\
 
-On peut aussi représenter une variable propositionnelle $A$ par $A \rightarrow 1, 0$
+On peut aussi représenter une variable propositionnelle $A$ par $A \rightarrow 1, 0$.\\
 
-On introduit donc la \textit{Forme Normale If-then-else} (INF : \textit{If-then-else Normal Form}) comme étant une expression Booléenne construite entièrement avec l'opérateur \textit{if-then-else}, 1 et 0 appliqué aux variables propositionnelles de la formule qu'elle traduit.\\
+On déduit des deux premiers exemples ci-dessus que l'opérateur \textit{if-then-else} représente un système complet (c'est à dire que pour chaque formule il existe une formule, uniquement composée de l'opérateur \textit{if-then-else} et de variables propositionnelles, qui lui est équivalente), on introduit donc la \textit{Forme Normale If-then-else} (INF : \textit{If-then-else Normal Form}) comme étant une expression Booléenne construite uniquement avec l'opérateur \textit{if-then-else}, 1 et 0 appliqué aux variables propositionnelles de la formule qu'elle traduit.\\
 
 En notant $t[0/x]$ l'expression obtenu en remplaçant la variable $x$ par $0$ dans $t$, on remarque assez facilement que :
 $$ t = x \rightarrow t[1/x], t[0/x] $$ pour chaque variable de t.\\
@@ -1082,7 +1087,7 @@ Nous avons observé que pour certaine expression le nombre de noeud des ROBDD po
     \caption{ROBDD d'ordre $x_1<x_2<x_3<x_4<x_5<x_6$ puis d'ordre $x_1<x_3<x_5<x_2<x_4<x_6$ de la formule : $ (x_1 \vee x_2) \wedge (x_3 \vee x_4) \wedge (x_5 \vee x_6)$}
 \end{figure}
 
-Nous nous sommes donc demandé comment trouver le meilleur ordre (celui qui donne un nombre minimal de noeud dans le ROBDD) pour une expression Booléenne donnée afin d'améliorer notre algorithme.
+Nous nous sommes donc demandés comment trouver le meilleur ordre (celui qui donne un nombre minimal de noeud dans le ROBDD) pour une expression Booléenne donnée afin d'améliorer notre algorithme.
 
 Malheuresement, il s'avère que trouver le meilleur ordre est un problème NP-Complet ce qui ne permet pas de réduire la compléxité de la fonction BUILD.
 
@@ -1096,7 +1101,7 @@ On a du faire un travail de recherche sur les différents ordres possibles pour 
 Si un tel ordre existait, on pourrait construire l'arbre en temps polynomiale et ensuite trouver une solution en temps linéaire : ce qui pourrait être très intéressant pour un Sat-solveur.\\
 On a vu que pour une même \expp, on peut avoir deux ordres différents nous donnant un nombre de nœud totalement différent.\\
 Ceci est une toute nouvelle approche possible qu'on a pu avoir.\\
-Cependant, l'utilisation d'un \adboc est surtout pour déterminer si deux \expps sont équivalentes : comme on construit un arbre canonique, on obtient, pour un même ordre, le même arbre si les deux\expps sont équivalentes.\\
+Cependant, l'utilisation d'un \adboc est surtout pour déterminer si deux \expps sont équivalentes : comme on construit un arbre canonique, on obtient, pour un même ordre, le même arbre si les deux \expps sont équivalentes.\\
 Ensuite, un \adboc permet aussi de représenter une \expp sous une forme plus compréhensible par un humain.\\
 Nous tenions à remercier Monsieur Sedki Boughattas qui nous a encadré pour ce projet. Nous avons été très intéressé par ce sujet.
 %%%%% Bibliographie %%%%%%%
