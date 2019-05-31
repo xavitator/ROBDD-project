@@ -446,42 +446,47 @@ On a vu précédement que l'on peut associer à toute formule propositionnelle u
 
 On pose la valuation d'une formule comme une fonction binaire $f :\mathbb{B}^n \to \mathbb{B}$ (où $n$ est le nombre de variable dans la formule).\\
 
-\textbf{Lemme (Canonicité): } Pour toute fonction $f :\mathbb{B}^n \to \mathbb{B}$ il existe exactement un ROBDD $u$ avec comme ordre $x_1 < x_2 < ... < x_n$ notée $f^u = f(x_1,x_2,...,x_n)$
+\subsubsection{Lemme (Canonicité):} 
+Pour toute fonction $f :\mathbb{B}^n \to \mathbb{B}$ il existe exactement un ROBDD $u$ avec comme ordre $x_1 < x_2 < ... < x_n$ notée $f^u = f(x_1,x_2,...,x_n)$.\\
 
 Pour simplifier la démonstration, on pose :\\
-\begin{center}
-$f_b(x_2,...,x_n) = f(b,x_2,...,x_n)$ où $b \in \mathbb{B}$\\
-\end{center}
+$$f_b(x_2,...,x_n) = f(b,x_2,...,x_n) \text{ où } b \in \mathbb{B}$$
 
-\textbf{Démonstration } Par induction sur $n$ :\\
+\paragraph{Démonstration} par induction sur $n$ :\\
 
-Si $n = 0$\\
+\begin{itemize}
+\item Si $n = 0$ : \\
 Alors il n'existe que deux fonctions binaires sans argument : $f = 0$ et $f = 1$.\\
 Et il n'y a que deux ROBDD qui n'utilisent pas de variable : $0 (= false)$ et $1 (= true)$\\
 Or $0$ est un ROBDD pour $f = 0$ mais pas pour $f = 1$ \\
 et $1$ est un ROBDD pour $f = 1$ mais pas pour $f = 0$ \\
 Donc il y a un unique ROBDD pour chaque $f :\mathbb{B}^0 \to \mathbb{B}$ \\
 
-Si $n \neq 0$\\
+\item Si $n \neq 0$ :\\
 Supposons que le Lemme est vrai pour tout $k <= n$, montrons que le Lemme est aussi vrai pour $n+1$.\\
 
 Soit $f :\mathbb{B}^{n+1} \to \mathbb{B}$.
 Alors $f(x_1,...,x_{n+1}) = x_1 \rightarrow f_1(x_2,...,x_{n+1}), f_0(x_2,...,x_{n+1})$\\
 Par induction : il y existe des uniques ROBDD $u_0$ et $u_1$ tels que $f^{u_0} = f_0$ et $f^{u_1} = f_1$.\\
-
-Il y a deux cas à considérer :\\
-
-Si $u_1 = u_0$ alors $f_0 = f^{u_0} = f^{u_1} = f_1$ donc $u_0 (= u_1)$ est aussi un ROBDD pour $f$. Qui est aussi unique dû à l'ordre.\\
+On revient ensuite à considérer deux cas :
+\begin{itemize}
+\item Si $u_1 = u_0$ :\\
+On a $f_0 = f^{u_0} = f^{u_1} = f_1$ donc $u_0 (= u_1)$ est aussi un ROBDD pour $f$, ce qui est aussi unique dû à l'ordre.\\
 En effet, si $x_1$ se trouvait dans le ROBDD enraciné dans $u$ alors $var(u) = x_1$.\\
 Cependant $f = f^u$ alors $f_0 = f^u[0/x_1] = f^{low(u)}$ et $f_1 = f^u[1/x_1] = f^{high(u)}$ mais $f_0 = f_1$ alors par induction $low(u) = high(u)$ ce qui viole une des propriétés des ROBDD.\\
 
-Si $u_1 \neq u_0$ alors par induction $f_{u_0} \neq f_{u_1}$.\\
+\item Si $u_1 \neq u_0$ :\\
+On a par induction $f_{u_0} \neq f_{u_1}$.\\
 Construisons $u$ tel que $var(u) = x_1$, $low(u) = u_0$ et $high(u) = u_1$ ainsi $f^u = x_1 \rightarrow f^{u_1}, f^{u_0}$\\
 Par induction $f^{u_1} = f_1$ et $f^{u_0} = f_0$. Or $f(x_1,...,x_{n+1}) = x_1 \rightarrow f_1(x_2,...,x_{n+1}), f_0(x_2,...,x_{n+1})$ donc $f = f^u$ \\
 Supposons $v$ un ROBDD tel que $f = f^v$. Clairement $f^v$ dépend de $x_1$. Donc $f^v[0/x_1] \neq f^v[1/x_1]$ (Sinon cela violerait le ROBDD).\\
 Grâce à l'ordre $var(u) = x_1 = var(v)$.\\
-De plus $f^u = f$ donc $f^{low(v) = f_0 = f^{u_0}}$ et $f^{high(v) = f_1 = f^{u_1}}$ par induction $low(v) = u_0 = low(u)$ et $high(v) = u_1 = high(u)$.\\
-Donc par unicité des ROBDD $u = v$
+De plus $f^u = f$ donc $f^{low(v)} = f_0 = f^{u_0}$ et $f^{high(v)} = f_1 = f^{u_1}$ par induction $low(v) = u_0 = low(u)$ et $high(v) = u_1 = high(u)$.\\
+Donc par unicité des ROBDD : $u = v$
+\end{itemize}
+\end{itemize}
+
+On a donc démontré qu'un ROBDD d'une \expp était unique grâce à sa construction.
 
 
 %%%%% Chapitre 2 %%%%%%%
