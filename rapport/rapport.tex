@@ -8,11 +8,11 @@
 \usepackage[T1]{fontenc}
 \usepackage{mathenv}
 \usepackage{array}
-\usepackage{mdwtab}
 \usepackage[colorlinks=true,linkcolor=black]{hyperref}
 \frenchbsetup{StandardLists=true}
 \usepackage{listings}
-\usepackage{xcolor}
+\usepackage{xcolor, colortbl}
+\usepackage{chessboard}
 \usepackage{graphicx}
 \usepackage{tikz}
 \usepackage{titling}
@@ -48,6 +48,7 @@
 
 \newcommand{\largeur}{0.5\linewidth}
 
+
 \begin{document}
 
 \pretitle{%
@@ -74,11 +75,12 @@
 \section*{Présentation du sujet}
 Ce document est un projet de Mathématiques et d'Informatique suivi et encadré par un enseignant chercheur à l'Université Paris Diderot.\\
 Nous allons ici traiter des arbres de décisions binaires. Le projet se base sur l'article de Henrik Reif Andersen \og\textit{An Introduction to Binary Decision Diagrams}\fg{}.\\
-Ce document traite de ce qu'est un arbre de décision binaire, et de la représentation de toutes expressions propositionnelles en un arbre de décision binaire. Enfin, il expose un algorithme permettant de construire l'\adb correspondant à une expression propositionnelle quelconque.\\
+Ce document traite de la définition d'un arbre de décision binaire et de la représentation de toutes expressions propositionnelles en un arbre de décision binaire. Enfin, il expose un algorithme permettant de construire l'\adb correspondant à une expression propositionnelle quelconque.\\
+Certaines notations reprennent la notation anglaise pour que le lecteur ne soit pas perdu dans les différences de notation entre les langues.
 
-\section*{Qu'est ce qu'une expression propositionnelle}
+\section*{Qu'est ce qu'une expression propositionnelle ?}
 
-Dans un premier temps, on va présenter ce qu'est une expression propositionnelle.\\
+\noindent Dans un premier temps, on va présenter ce qu'est une expression propositionnelle.\\
 \subsubsection*{Variable propositionnelle}
 Une variable propositionnelle correspond à une variable comme en Mathématiques. Cependant, son ensemble de définition correspond à l'ensemble $\{0,1\}$, où ici on peut apparenter $0$ à \textit{faux} et $1$ à \textit{vrai}.\\
 Pour lier différentes variables propositionnelles entre elles, on va introduire des connecteurs logiques.
@@ -150,10 +152,10 @@ $1$ & $0$ & $1$ \\
 \caption{Tables de vérités des cinq connecteurs logiques}
 \end{figure}
 
-Ces connecteurs logiques ne sont bien évidemment pas les seuls à exister, mais ce sont ceux qu'on accepte dans notre algorithme qu'on présentera plus tard.
+Ces connecteurs logiques ne sont bien évidemment pas les seuls à exister, mais ce sont ceux acceptés dans notre algorithme qui sera présenté dans le chapitre \ref{algo}.
 
 \subsubsection{Expression propositionnelle}
-Une \expp, appelée aussi formule, est définie récurcivement de la façon suivante :
+Une \expp, appelée aussi formule, est définie récursivement de la façon suivante :
 
 \begin{itemize}
 \item Toute variable propositionnelle est une formule.
@@ -164,37 +166,37 @@ Voici un exemple d'\expp :
 $$(x \wedge y) \vee ((\neg z) \Rightarrow (x \Leftrightarrow t))$$
 avec $x,y,z$ et $t$ des variables propositionnelles.\\
 
-Par soucis de lisibilité, lorsqu'on écrira une expression propositionnelle, on ajoutera des parenthèses.\\
+\noindent Par soucis de lisibilité, lorsqu'on écrira une expression propositionnelle, on ajoutera des parenthèses.\\
 Prenons l'expression $x\wedge y\vee 1$. On ne va pas avoir la même table de vérité si on écrit $(x\wedge y)\vee 1$ (qui sera toujours vrai) et si on écrit $x \wedge (y \vee 1)$ (qui sera faux si $x$ est faux).\\
 Cependant, grâce à l'associativité de $\vee$, celle de $\wedge$ et des règles de priorité fixées, on peut omettre les parenthèses dans certaines expressions. Comme par exemple :
 $$x \wedge y \wedge z \hspace{2em} et \hspace{2em} \neg x \Rightarrow y \vee z$$
 
-\section*{Qu'est ce qu'une ROBDD (présentation rapide)}
+\section*{Présentation rapide d'une ROBDD}
 
-\noindent Nous allons ensuite introduire la notion d'arbre de décision binaire, on le notera \textit{ADB} ou \textit{BDD} en anglais (Binary Decision Diagram). Cela se présente de la sorte :
+\noindent Nous allons ensuite introduire la notion d'arbre de décision binaire, on le notera \textit{BDD} (pour \textit{Binary Decision Diagram}). Cela se présente de la sorte :
 
 \begin{figure}[htbp]
   \centering
   \includegraphics[trim = 0cm 1.5cm 0cm 1cm , scale=0.6]{exemple/impl_simple}
-  \caption{ADB d'un implication simple : $x_0 \Rightarrow x_1$}
+  \caption{BDD d'un implication simple : $x_0 \Rightarrow x_1$}
 \end{figure}
 Cet arbre se lit de haut en bas : on commence par évaluer la première variable, soit à $vrai$ soit à $faux$. Ensuite on arrive dans un autre état où la première variable n'existera plus et sera remplacé par son évaluation.\\
 On réitère ensuite ce processus pour les variables qui suivent.\\
-La flèche en pointillée représente le chemin à emprunter si la variable correspondant au nœud a 0 pour valeur de vérité et la flèche pleine correspond à la valeur de vérité 1.\\
+La flèche en pointillée représente le chemin à emprunter si la variable correspondant au nœud a 0 (valuation à \textit{faux}) pour valeur de vérité et la flèche pleine correspond à la valeur de vérité 1 (valuation à \textit{vrai}).\\
 Ici, on voit bien que si $x_0$ est faux, alors l'implication est vrai, quelque soit la valeur de vérité de $x_1$.\\
 Si $x_0$ est vrai, alors il faut regarder la valeur de vérité de $x_1$ : si $x_1$ est vrai, alors l'implication est vraie et si $x_1$ est faux alors l'implication est fausse.\\
 
-Ici, on a aussi introduit l'idée que cet arbre est ordonné, qu'on notera \textit{ADBO} (arbre de décision binaire ordonné) ou \textit{OBDD} en anglais (Ordered Binary Decision Diagram).\\
+Ici, on a aussi introduit l'idée que cet arbre est ordonné, qu'on notera \textit{OBDD} (pour \textit{Ordered Binary Decision Diagram}).\\
 Il faut donner un ordre aux variables pour savoir dans quel ordre on va attribuer une valeur de vérité aux variables pour former l'arbre.\\
-On le présentera plus en détail plus tard, mais il s'avère que l'arbre dépend de l'ordre choisi : on peut obtenir un arbre plus petit avec un certain ordre et un autre beaucoup plus grand avec un autre ordre.\\
+On le présentera plus en détail dans la section \ref{order}, mais il s'avère que l'arbre dépend de l'ordre choisi : on peut obtenir un arbre plus petit avec un certain ordre et un autre beaucoup plus grand avec un autre ordre.\\
 
-Enfin, introduisons la notion d'unicité de cet arbre. La construction de l'arbre est unique modulo l'ordre choisi, c'est à dire qu'en ayant fixé un ordre, toutes les expressions équivalentes posséderont le même ADB. On le notera \textit{ADBOC} (arbre de décision binaire ordonné canonique) ou \textit{ROBDD} en anglais (Reduced Ordered Binary Decision Diagram).\\
+Enfin, introduisons la notion d'unicité de cet arbre. La construction de l'arbre est unique modulo l'ordre choisi, c'est à dire qu'en ayant fixé un ordre, toutes les \expps équivalentes posséderont le même OBDD. On le notera \textit{ROBDD} (pour \textit{Reduced Ordered Binary Decision Diagram}).\\
  
 \section*{Organisation}
 On va ici vous présenter les résultats de notre recherche sur le sujet.\\
-Dans un premier temps, on va vous présenter les propriétés d'un ADBOC et la raison pour laquelle on peut générer pour toutes \expps un ADBOC.\\
-Ensuite, nous présenterons l'algorithme que nous avons implémenté en Ocaml pour pouvoir générer ces ADBOCs. Nous discuterons aussi de la complexité de cet algorithme.\\
-Enfin, nous présenterons les intérêts des ADBOCs ainsi que des réflexions qu'on peut avoir sur leurs utilisations.  
+Dans un premier temps, on va vous présenter les propriétés d'un ROBDD et la raison pour laquelle on peut générer pour toutes \expps un ROBDD.\\
+Ensuite, nous présenterons l'algorithme que nous avons implémenté en Ocaml pour pouvoir générer ces ROBDD. Nous discuterons aussi de la complexité de cet algorithme.\\
+Enfin, nous présenterons les intérêts des ROBDD ainsi que des réflexions qu'on peut avoir sur leurs utilisations.  
 
 
 
@@ -218,79 +220,74 @@ Tout les operateurs peuvent assez facilement être traduits en utilisant uniquem
 
 où $A$ et $B$ sont des variables propositionnelles.\\
 
-On peut aussi représenter une variable propositionnelle $A$ par $A \rightarrow 1, 0$.\\
+\noindent On peut aussi représenter une variable propositionnelle $A$ par $A \rightarrow 1, 0$.\\
 
-On déduit des deux premiers exemples ci-dessus que l'opérateur \textit{if-then-else} représente un système complet (c'est à dire que pour chaque formule il existe une formule, uniquement composée de l'opérateur \textit{if-then-else} et de variables propositionnelles, qui lui est équivalente), on introduit donc la \textit{Forme Normale If-then-else} (INF : \textit{If-then-else Normal Form}) comme étant une expression Booléenne construite uniquement avec l'opérateur \textit{if-then-else}, 1 et 0 appliqué aux variables propositionnelles de la formule qu'elle traduit.\\
+\noindent On déduit des deux premiers exemples ci-dessus que l'opérateur \textit{if-then-else} représente un système complet (c'est à dire que pour chaque formule il existe une formule, uniquement composée de l'opérateur \textit{if-then-else} et de variables propositionnelles, qui lui est équivalente), on introduit donc la \textit{Forme Normale If-then-else} (INF : \textit{If-then-else Normal Form}) comme étant une expression Booléenne construite uniquement avec l'opérateur \textit{if-then-else}, 1 et 0 appliqué aux variables propositionnelles de la formule qu'elle traduit.\\
 
-En notant $t[0/x]$ l'expression obtenu en remplaçant la variable $x$ par $0$ dans $t$, on remarque assez facilement que :
+En notant $t[0/x]$ l'expression obtenu en remplaçant la variable $x$ par $0$ dans la formule $t$, on remarque assez facilement que :
 $$ t = x \rightarrow t[1/x], t[0/x] $$ pour chaque variable de t.\\
-On appelle se résultat l'\textit{Expansion de Shannon} de $t$ sur $x$.
-
-Grâce à ce résultat, on peut générer, pour chaque expression booléenne, une INF en réitèrant l'expansion de Shannon sur chaque variable de l'expression.
-
+On appelle se résultat l'\textit{Expansion de Shannon} de $t$ sur $x$.\\
+Grâce à ce résultat, on peut générer, pour chaque expression booléenne, une INF en réitèrant l'expansion de Shannon sur chaque variable de l'expression.\\
 On a vu précédement que toute expression Booléenne est équivalente à une expression en INF, on a maintenant un moyen de la trouver.\\
 
-Exemple : Soit $t = ( x_1 \Leftrightarrow y_1 ) \wedge ( x_2 \Leftrightarrow y_2 )$.\\
+\paragraph{Exemple} Soit $t = ( x_1 \Leftrightarrow y_1 ) \wedge ( x_2 \Leftrightarrow y_2 )$.\\
 On peut donc appliquer l'expansion de Shannon :
-$$
-\begin{array}{lcl}
-t = x_1 \rightarrow t_1, t_0&&\\
-t_0 = y_1 \rightarrow 0, t_{00}&&\\
-t_1 = y_1 \rightarrow t_{11}, 0&&\\
-t_{00} = x_2 \rightarrow t_{001}, t_{000}&&\\
-t_{11} = x_2 \rightarrow t_{111}, t_{110}&&\\
-t_{000} = y_2 \rightarrow 0, 1&&\\
-t_{001} = y_2 \rightarrow 1, 0&&\\
-t_{110} = y_2 \rightarrow 0, 1&&\\
-t_{111} = y_2 \rightarrow 1, 1&&\\
-\end{array}
-$$
+
+\begin{center}
+\begin{tabular}{l}
+$t = x_1 \rightarrow t_1, t_0$\\
+$t_0 = y_1 \rightarrow 0, t_{00}$\\
+$t_1 = y_1 \rightarrow t_{11}, 0$\\
+$t_{00} = x_2 \rightarrow t_{001}, t_{000}$\\
+$t_{11} = x_2 \rightarrow t_{111}, t_{110}$\\
+$t_{000} = y_2 \rightarrow 0, 1$\\
+$t_{001} = y_2 \rightarrow 1, 0$\\
+$t_{110} = y_2 \rightarrow 0, 1$\\
+$t_{111} = y_2 \rightarrow 1, 1$\\
+\end{tabular}
+\end{center}
 
 \section{Les ROBDD et leurs propriétés}
 
-On introduit les \textit{Diagrammes de Décision Binaire} (BDD) définis avec :
+\noindent On introduit les \textit{Diagrammes de Décision Binaire} (BDD) définis avec :
 \begin{itemize}
-\item les noeuds représentant les expressions booléennes t la variable $x$ dans l'expansion de Shannon.
+\item les noeuds représentant les expressions booléennes pour la variable $x$ dans l'expansion de Shannon.
 \item Les arêtes en pointillés représentant la valuation de $x$ en $0$ dans l'expansion de Shannon.
 \item Les arêtes pleines représentant la valuation de $x$ en $1$ dans l'expansion de Shannon.
 \end{itemize}
 
-Ainsi, chaque noeud non-terminal représente une expansion de Shanon $ t = x \rightarrow t_1, t_0 $ et est représenté par un triplet $(var, low, high)$ où :
+\noindent Ainsi, chaque noeud non-terminal représente une expansion de Shanon $ t = x \rightarrow t_1, t_0 $ et est représenté par un triplet $(var, low, high)$ où :
 \begin{itemize}
 \item $var$ est $x$
 \item $low$ est le noeud représentant $t_0$
 \item $high$ est le noeud représentant $t_1$
 \end{itemize}
 
-Les noeuds terminaux sont $0$ et $1$\\
-
+\noindent Les noeuds terminaux sont $0$ et $1$.\\
 On représente donc une expression par le noeud racine.\\
-
-Avec l'exemple précédent, on obtient le BDD suivant :
-
+Avec l'exemple précédent, on obtient le BDD suivant :\\
 \begin{figure}[h]
 \centering
-      \begin{tikzpicture}[shorten >=1pt,node distance=1cm]
+\begin{tikzpicture}[shorten >=1pt,node distance=1cm]
 \node[state]		   (X1) at (0,4)         {$x_1$};
   \node[state]		   (Y11) at (-1,3)         {$y_1$};
   \node[state]		   (Y12) at (1,3)         {$y_1$};
   \node[state]		   (X21) at (-2,2)         {$x_2$};
   \node[state]		   (X22) at (2,2)         {$x_2$};
-  \node[state]		   (Y21) at (-4,1)         {$y_2$};
-  \node[state]		   (Y22) at (-2,1)         {$y_2$};
-  \node[state]		   (Y23) at (2,1)         {$y_2$};
-  \node[state]		   (Y24) at (4,1)         {$y_2$};
-  \node[state, accepting, below]		   (T1) at (-4.5,0)         {$1$};
-  \node[state, accepting, below]		   (F1) at (-3.5,0)         {$0$};
-  \node[state, accepting, below]		   (F2) at (-2.5,0)         {$0$};
-  \node[state, accepting, below]		   (T2) at (-1.5,0)         {$1$};
-  \node[state, accepting, below]		   (F3) at (-0.5,0)         {$0$};
-  \node[state, accepting, below]		   (F4) at (0.5,0)         {$0$};
-  \node[state, accepting, below]		   (T3) at (1.5,0)         {$1$};
-  \node[state, accepting, below]		   (F5) at (2.5,0)         {$0$};
-  \node[state, accepting, below]		   (F6) at (3.5,0)         {$0$};
-  \node[state, accepting, below]		   (T4) at (4.5,0)         {$1$};
-
+  \node[state, below]		   (Y21) at (-4,1)         {$y_2$};
+  \node[state, below]		   (Y22) at (-2,1)         {$y_2$};
+  \node[state, below]		   (Y23) at (2,1)         {$y_2$};
+  \node[state, below]		   (Y24) at (4,1)         {$y_2$};
+   \node[state, accepting, below]		   (T1) at (-4.5,-0.5)         {$1$};
+   \node[state, accepting, below]		   (F1) at (-3.5,-0.5)         {$0$};
+   \node[state, accepting, below]		   (F2) at (-2.5,-0.5)         {$0$};
+   \node[state, accepting, below]		   (T2) at (-1.5,-0.5)         {$1$};
+   \node[state, accepting, below]		   (F3) at (-0.5,-0.5)         {$0$};
+   \node[state, accepting, below]		   (F4) at (0.5,-0.5)         {$0$};
+   \node[state, accepting, below]		   (T3) at (1.5,-0.5)         {$1$};
+   \node[state, accepting, below]		   (F5) at (2.5,-0.5)         {$0$};
+   \node[state, accepting, below]		   (F6) at (3.5,-0.5)         {$0$};
+   \node[state, accepting, below]		   (T4) at (4.5,-0.5)         {$1$};
 
   \path[->,>=stealth', dashed] 
 		(X1) edge              node {} (Y11)
@@ -319,28 +316,29 @@ Avec l'exemple précédent, on obtient le BDD suivant :
 
 Si les variables apparaîssent dans un même ordre tout au long de la construction du BDD, on dit que le diagramme est \textit{ordonné} (OBDD).\\
 
-On remarque certains noeuds sont dupliqués.\\
+\noindent On remarque certains noeuds sont dupliqués.\\
 Ainsi, dans l'exemple lors de la construction, on réduit par :
+\begin{center}
+\begin{tabular}{l}
+$t_{000} = t_{110}$\\
+$t_{001} = t_{111}$\\
+$t_{00} = t_{11}$\\
+\end{tabular}
+\end{center}
 
-$$\begin{array}{lcl}
-t_{000} = t_{110}&&\\
-t_{001} = t_{111}&&\\
-t_{00} = t_{11}&&\\
-\end{array}$$
+\noindent Et on obtient :
+\begin{center}
+\begin{tabular}{l}
+$t = x_1 \rightarrow t_1, t_0$\\
+$t_0 = y_1 \rightarrow 0, t_{00}$\\
+$t_1 = y_1 \rightarrow t_{00}, 0$\\
+$t_{00} = x_2 \rightarrow t_{001}, t_{000}$\\
+$t_{000} = y_2 \rightarrow 0, 1$\\
+$t_{001} = y_2 \rightarrow 1, 0$\\
+\end{tabular}
+\end{center}
 
-Et on obtient :
-
-$$\begin{array}{lcl}
-t = x_1 \rightarrow t_1, t_0&&\\
-t_0 = y_1 \rightarrow 0, t_{00}&&\\
-t_1 = y_1 \rightarrow t_{00}, 0&&\\
-t_{00} = x_2 \rightarrow t_{001}, t_{000}&&\\
-t_{000} = y_2 \rightarrow 0, 1&&\\
-t_{001} = y_2 \rightarrow 1, 0&&\\
-\end{array}$$
-
-Le diagramme devient donc :\\
-
+\noindent Le diagramme devient donc :\\
 \begin{figure}[h]
 \centering
       \begin{tikzpicture}[shorten >=1pt,node distance=1cm]
@@ -373,11 +371,10 @@ Le diagramme devient donc :\\
 \caption{ROBDD de $( x_1 \Leftrightarrow y_1 ) \wedge ( x_2 \Leftrightarrow y_2 )$}
 \end{figure}
 
-Si tout noeud redondant a été supprimé et tous noeuds identiques ont été réduits, on dit que le diagramme est \textit{réduit} (ROBDD).\\
+\noindent Si tous les noeuds redondants ont été supprimés et tous les noeuds identiques ont été réduits, on dit que le diagramme est \textit{réduit} (ROBDD).\\
 
-Un ROBDD admet donc plusieurs propriétés :
-
-\begin{itemize}
+\noindent Un ROBDD admet donc plusieurs propriétés :
+\begin{enumerate}
 \item Contient un ou deux noeud terminaux ($0$ et/ou $1$)
 \item Contient un ensemble de noeuds $u$ non-terminaux de degré 2 ($var(u)$ la variable $x$ du noeud, $low(u)$ le noeud de $t[0/x]$, $high(u)$ le noeud de $t[1/x]$)
 \item Les var(u) des noeuds respectent un ordre en fonction de leur place dans le diagramme ($x_1 < x_2 < ... < x_n$). Cela correspond à l'ordonnancement des variables :
@@ -398,6 +395,7 @@ Un ROBDD admet donc plusieurs propriétés :
 \end{tikzpicture}
 \caption{Ordonnée : x < y, x < z}
 \end{figure}
+\newpage
 \item Soit 2 noeuds $u$ et $v$, si $var(u) = var(v)$, $low(u) = low(v)$ et $high(u) = high(v)$ alors $u = v$ : propriété de l'unicité.
 \begin{figure}[h]
 \centering
@@ -438,18 +436,18 @@ Un ROBDD admet donc plusieurs propriétés :
 \end{tikzpicture}
 \caption{Représentation graphique de la non-redondance}
 \end{figure}
-\end{itemize}
+\end{enumerate}
 
 \section{Un unique ROBDD pour chaque fonction binaire}
 
-On a vu précédement que l'on peut associer à toute formule propositionnelle un ROBDD.\\
+\noindent On a vu précédement que l'on peut associer à toute formule propositionnelle un ROBDD.\\
 
-On pose la valuation d'une formule comme une fonction binaire $f :\mathbb{B}^n \to \mathbb{B}$ (où $n$ est le nombre de variable dans la formule).\\
+\noindent On pose la valuation d'une formule comme une fonction binaire $f :\mathbb{B}^n \to \mathbb{B}$ (où $n$ est le nombre de variable dans la formule).\\
 
 \subsubsection{Lemme (Canonicité):} 
 Pour toute fonction $f :\mathbb{B}^n \to \mathbb{B}$ il existe exactement un ROBDD $u$ avec comme ordre $x_1 < x_2 < ... < x_n$ notée $f^u = f(x_1,x_2,...,x_n)$.\\
 
-Pour simplifier la démonstration, on pose :\\
+\noindent Pour simplifier la démonstration, on pose :
 $$f_b(x_2,...,x_n) = f(b,x_2,...,x_n) \text{ où } b \in \mathbb{B}$$
 
 \paragraph{Démonstration} par induction sur $n$ :\\
@@ -478,11 +476,12 @@ Cependant $f = f^u$ alors $f_0 = f^u[0/x_1] = f^{low(u)}$ et $f_1 = f^u[1/x_1] =
 \item Si $u_1 \neq u_0$ :\\
 On a par induction $f_{u_0} \neq f_{u_1}$.\\
 Construisons $u$ tel que $var(u) = x_1$, $low(u) = u_0$ et $high(u) = u_1$ ainsi $f^u = x_1 \rightarrow f^{u_1}, f^{u_0}$\\
-Par induction $f^{u_1} = f_1$ et $f^{u_0} = f_0$. Or $f(x_1,...,x_{n+1}) = x_1 \rightarrow f_1(x_2,...,x_{n+1}), f_0(x_2,...,x_{n+1})$ donc $f = f^u$ \\
+Par induction $f^{u_1} = f_1$ et $f^{u_0} = f_0$.\\
+Or $f(x_1,...,x_{n+1}) = x_1 \rightarrow f_1(x_2,...,x_{n+1}), f_0(x_2,...,x_{n+1})$ donc $f = f^u$.\\
 Supposons $v$ un ROBDD tel que $f = f^v$. Clairement $f^v$ dépend de $x_1$. Donc $f^v[0/x_1] \neq f^v[1/x_1]$ (Sinon cela violerait le ROBDD).\\
 Grâce à l'ordre $var(u) = x_1 = var(v)$.\\
 De plus $f^u = f$ donc $f^{low(v)} = f_0 = f^{u_0}$ et $f^{high(v)} = f_1 = f^{u_1}$ par induction $low(v) = u_0 = low(u)$ et $high(v) = u_1 = high(u)$.\\
-Donc par unicité des ROBDD : $u = v$
+Donc par unicité des ROBDD : $u = v$.
 \end{itemize}
 \end{itemize}
 
@@ -492,13 +491,14 @@ On a donc démontré qu'un ROBDD d'une \expp était unique grâce à sa construc
 %%%%% Chapitre 2 %%%%%%%
 \chapter{Construction d'une ROBDD}
 
-On a implémenté tout un algorithme (en Ocaml) prenant en argument une expression propositionnelle et permettant d'obtenir l'ADBOC de celle-ci.\\
+\label{algo}
+On a implémenté tout un algorithme (en Ocaml) prenant en argument une expression propositionnelle et permettant d'obtenir le ROBDD de celle-ci.\\
 On va vous présenter les fonctions principales.
 
-\section{présentation de l'algorithme}
+\section{Présentation de l'algorithme}
 
 Il faut déjà comprendre que l'algorithme implémenté est dans un paradigme impératif et qu'on va utiliser une structure correspondante à une Hashmap : l'accès à un élément est linéaire amorti et l'ajout est en temps linéaire amorti, c'est à dire qu'on peut faire ces opérations en temps constant dans un moyenne des temps mais en temps linéaire dans le pire des cas.\\
-Notons avant de comprendre l'algorithme en détail que nous avons une structure, noté $S$, qui nous permet d'associer un nœud de l'arbre à ses deux nœuds enfants : on notera \textit{low} pour le nœud suivant la valuation à \textit{faux} et \textit{high} le nœud correspondant à la valuation \textit{vrai} de la variable du nœud parent.\\
+Notons avant de comprendre l'algorithme en détail que nous avons une structure, noté $S$, qui nous permet d'associer un nœud de l'arbre à ses deux nœuds enfants : on notera \textit{low} pour le nœud correspondant à la valuation à \textit{faux} et \textit{high} le nœud correspondant à la valuation \textit{vrai} de la variable du nœud parent.\\
 Enfin, on indicera les variables par leur rang dans l'ordre : $x_n$ est la $n$-ième variable, $n\in \mathbb{N}$ et $n\geq 0$.\\
 
 L'algorithme est basé sur un principe récursif, on refait la même étape jusqu'à atteindre la condition de fin :
@@ -765,7 +765,10 @@ On peut ensuite chercher \textit{high}. A l'étape 4, on associe $1$ à $x_4$ et
         (C) edge              node {} (F)
         (E) edge              node {} (F);
 \end{tikzpicture}
-   \end{minipage} \hfill
+   \end{minipage} 
+\end{figure} 
+
+\begin{figure}[!h]
 \begin{minipage}[c]{\largeur}
       \begin{tikzpicture}[shorten >=1pt,node distance=1cm]
 \node 			(X) at (-3,4)		{Étape 7};
@@ -956,7 +959,7 @@ On va voir dans la partie d'après nos réflexions là-dessus.
 %%%%% Chapitre 3 %%%%%%%
 \chapter{Intérêt et optimisation}
 
-\section{Sat-solveur mais mauvais}
+\section{Mauvais sat-solveur}
 
 La première utilisation des ROBDD est en tant que Sat-solveur. En effet, le fait de savoir si une formule admet une solution se fait en temps constant, dès que l'on a son ROBDD, car si la formule n'admet pas de solution alors elle est une antologie et par unicité des ROBDD, le ROBDD qui lui est associée est $0$.\\
 Et donc il suffit de comparer le premier noeud du ROBDD à $0$ pour savoir si il existe une solution.\\
@@ -967,18 +970,51 @@ On utilise ici les fonctions ANYSAT et ALLSAT (Et SATCOUNT si l'on n'a besoin un
 
 De là il est possible de résoudre des problèmes logiques comme le Problème des N Reines, le Sudoku ou encore des BenchMarks.\\
 
-\paragraph{Exemple} : Problème des 4 Reines
+\paragraph{Exemple : Problème des 4 Reines\\}
+
+On va tout d'abord représenter les cases d'un plateau de 4 par 4 et les variables propositionnelles associées :
+\begin{center}
+\setlength{\tabcolsep}{12pt}
+\renewcommand{\arraystretch}{3}
+\begin{tabular}{|c|c|c|c|}
+\hline 
+ \cellcolor{green}$x_{12}$ & $x_{13}$ 			  & \cellcolor{gray}$x_{14}$ & $x_{15}$ 				\\ 
+\hline
+ $x_8$ 					  & \cellcolor{gray}$x_9$ & $x_{10}$				 & \cellcolor{gray}$x_{11}$ \\ 
+\hline
+ \cellcolor{gray}$x_4$ 	  &  $x_5$				  & \cellcolor{gray}$x_6$	 & $x_7$ 					\\ 
+\hline
+$x_0$ 					  & \cellcolor{gray}$x_1$ & $x_2$ 					 & \cellcolor{gray}$x_3$ 	\\ 
+\hline 
+\end{tabular}
+\renewcommand{\arraystretch}{1}
+\setlength{\tabcolsep}{6pt}
+\end{center}
+
+\noindent On obtient, en passant par notre algorithme et en générant la formule correspondante à la résolution du problème, on obtient le ROBDD suivant :
+\newpage
 \begin{figure}[h]
 \centering
-\includegraphics[scale = 0.18]{exemple/queen_4.pdf}
+\includegraphics[scale = 0.22]{exemple/queen_4.pdf}
 \end{figure}
 
-On peut lire graphiquement que le problème des 4 reines possède un total de 2 solutions.\\
+\noindent On peut lire graphiquement que le problème des 4 reines possède un total de 2 solutions.\\
+Voici la représentation sur un échiquier des deux solutions (la branche de gauche correspond à l'échiquier de gauche et la branche de droite à celui de droite) :
+\begin{center}
+\setchessboard{
+showmover=false}
+\def\mylist{qa2, qb4, qd3, qc1}
+\setchessboard{setpieces=\mylist}
+\chessboard[largeboard,maxfield=d4]
+\def\mylist{Qa3, Qc4, Qd2, Qb1}
+\chessboard[largeboard,maxfield=d4]
+\end{center}
 
-La raison pour laquelle ce Sat-solveur n'est pas utilisé est que, bien que la compléxité de l'algorithme ANYSAT soit linéaire, la fonction BUILD est de compléxité exponentielle.\\
+\noindent La raison pour laquelle ce Sat-solveur n'est pas utilisé est que, bien que la compléxité de l'algorithme ANYSAT soit linéaire, la fonction BUILD est en compléxité exponentielle.\\
 
-Ainsi, des problèmes qui demandent de gros caluls, deviennent vraiment long à résoudre. Comme par exemple le Problème du Sudoku (vide) qui comporte plus de $6*10^{21}$ solutions
+\noindent Ainsi, des problèmes qui demandent de gros caluls, deviennent vraiment long à résoudre. Comme par exemple le Problème du Sudoku (vide) qui comporte plus de $6*10^{21}$ solutions
 
+\newpage
 \section{Correction et Equivalence de la combinatoire de circuit}
 
 Lorsque l'on a le ROBDD d'une formule, il est assez facile de voir qu'elles sont les distributions de valeur de vérité qui la satisfaite.\\
@@ -1074,7 +1110,7 @@ Pour la traduction des circuits en ROBDD sans passer par la formule revient à c
 \end{figure}
 
 Puis d'appliquer la fonction APPLY en fonction des portes logiques utiles.\\
-
+\newpage
 \begin{lstlisting}
 let apply (op : node->node->node) (u1 : node) (u2 : node) : node =
     let g = Hashtbl.create (map_size*map_size) in
@@ -1115,11 +1151,12 @@ Ainsi, vérifier qu'un circuit logique donne les bons résultats devient très s
 \newpage
 
 \section{Théorie sur les ordres}
-
+\label{order}
 Lors de nos recherches, nous avons remarqué que pour des ordres différents, une même expression Booléenne pouvait avoir des ROBDDs différents.\\
 Nous avons observé que pour certaine expression le nombre de noeud des ROBDD pouvait considérablement diminuer en fonction de l'ordre choisi a tel point que l'execution de BUILD n'était plus qu'en $O(n)$ au lieu de $2^n$ (où $n$ est le nombre de variable de l'expression).\\
 
 \begin{figure}[h]
+\centering
       \includegraphics[scale = 0.5]{exemple/bon_Ordre.pdf}
       \includegraphics[scale = 0.5]{exemple/mauvais_Ordre.pdf}
     \caption{ROBDD d'ordre $x_1<x_2<x_3<x_4<x_5<x_6$ puis d'ordre $x_1<x_3<x_5<x_2<x_4<x_6$ de la formule : $ (x_1 \vee x_2) \wedge (x_3 \vee x_4) \wedge (x_5 \vee x_6)$}
@@ -1142,8 +1179,9 @@ Ceci est une toute nouvelle approche possible qu'on a pu avoir.\\
 Cependant, l'utilisation d'un \adboc est surtout pour déterminer si deux \expps sont équivalentes : comme on construit un arbre canonique, on obtient, pour un même ordre, le même arbre si les deux \expps sont équivalentes.\\
 Ensuite, un \adboc permet aussi de représenter une \expp sous une forme plus compréhensible par un humain.\\
 Nous tenions à remercier Monsieur Sedki Boughattas qui nous a encadré pour ce projet. Nous avons été très intéressé par ce sujet.
+
 %%%%% Bibliographie %%%%%%%
-\chapter*{Bibliographie}
+\section*{Bibliographie}
 \addcontentsline{toc}{chapter}{Bibliographie}
 Article de Henrik Reif Andersen : \textit{An Introduction to Binary Decision Diagrams}
 
